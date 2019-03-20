@@ -12,6 +12,11 @@ export class Engine{ //TODO SCENE MANAGER
     activeScene;
     gl;
     time;
+    /**
+     * Create a new Engine and do the setup of all the environment.
+     * @param {WebGL_Context} gl The WebGl context obtained from a canvas. This will be the context of the entire Engine.
+     * used as the context of every Shader.
+     */
     constructor(gl){
       Math.radians = degrees => {
         var pi = Math.PI;
@@ -26,6 +31,11 @@ export class Engine{ //TODO SCENE MANAGER
       ShaderUtils.setGlContext(this.gl);
     }
 
+    /**
+     * 
+     * @param {Scene} scene add a scene to the list of scenes that the Engine manages.
+     * If there is no active scene, the added scene is set as the active one.
+     */
     addScene(scene){
       this.scenes.push(scene);
       if (!this.activeScene){
@@ -33,6 +43,9 @@ export class Engine{ //TODO SCENE MANAGER
       }
     }
 
+    /**
+     * Starts the rendering and the update of the time at every frame.
+     */
     doRendering() {
       //scena passa camera
       this.gl.clearColor(0.0, 0.0, 0.0, 1.0);

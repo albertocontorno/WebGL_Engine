@@ -1,5 +1,9 @@
 import {keys} from './keyCodes';
-
+/**
+ * @author Alberto Contorno
+ * @class
+ * Class used to manage the user inputs. It can manage keyboard and mouse.
+ */
 export class InputManager{
   keysPressed = {};
   mousePressed = {};
