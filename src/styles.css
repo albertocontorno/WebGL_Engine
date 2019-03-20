@@ -1,0 +1,23 @@
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+canvas{
+  border: 0;
+}
+
+#angle{
+  position: absolute;
+  top: 20px;
+  left: 150px;
+}
+
+.fps-counter{
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  color: yellow;
+}
