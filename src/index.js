@@ -22,16 +22,9 @@ const canvas = document.getElementById("app");
 inputs.lockMouse(canvas);
 const gl = WebGLUtils.setupWebGL(canvas);
 var aspect = gl.drawingBufferWidth / gl.drawingBufferHeight;
-var camera = new Camera(
-  vec3(0, 0, 0),
-  up,
-  5,
-  "perspective",
-  {},
+var camera = new Camera(vec3(0, 0, 0), up, 5, "perspective", {},
   { fov: 45, aspect: aspect, near: 0.1, far: 100 },
-  25,
-  { maxLevel: 3, 0: 30, 1: 45, 2: 75, 3: 90 },
-  1
+  25, { maxLevel: 3, 0: 30, 1: 45, 2: 75, 3: 90 }, 1
 );
 gl.enable(gl.DEPTH_TEST);
 gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -115,15 +108,8 @@ var floor = new SceneObject();
 floor.transform.position = [0, -1, 0];
 floor.transform.scale = [5, 0.5, 5];
 floor.addMesh(
-  new Mesh(
-    gl,
-    vertices,
-    indices,
-    {
-      vertex: triangleShaders.vertexShader,
-      fragment: triangleShaders.fragmentShader
-    },
-    5
+  new Mesh(gl, vertices, indices,
+    { vertex: triangleShaders.vertexShader, fragment: triangleShaders.fragmentShader }
   )
 );
 
@@ -131,35 +117,14 @@ scene.addObject(floor);
 scene.addObject(obj);
 scene.addObject(obj2);
 scene.addObject(obj3);
-let cube = new Mesh(
-  gl,
-  vertices,
-  indices,
-  {
-    vertex: triangleShaders.vertexShader,
-    fragment: triangleShaders.fragmentShader
-  },
-  2
+let cube = new Mesh(gl, vertices, indices,
+  { vertex: triangleShaders.vertexShader, fragment: triangleShaders.fragmentShader },
 );
-let cube2 = new Mesh(
-  gl,
-  vertices,
-  indices,
-  {
-    vertex: triangleShaders.vertexShader,
-    fragment: triangleShaders.fragmentShader
-  },
-  3
+let cube2 = new Mesh(gl, vertices, indices,
+   { vertex: triangleShaders.vertexShader, fragment: triangleShaders.fragmentShader },
 );
-let cube3 = new Mesh(
-  gl,
-  vertices,
-  indices,
-  {
-    vertex: triangleShaders.vertexShader,
-    fragment: triangleShaders.fragmentShader
-  },
-  4
+let cube3 = new Mesh(gl, vertices, indices,
+  { vertex: triangleShaders.vertexShader, fragment: triangleShaders.fragmentShader }
 );
 
 obj.addMesh(cube);

@@ -6,6 +6,8 @@ import { registeredComponents } from './Component';
  * @class
  */
 export class SceneObject{
+  static nextId = 0;
+  id;
   components = {};
   transform;
   meshes = []; //model
@@ -20,6 +22,8 @@ export class SceneObject{
   onDestroy = () => {};
 
   constructor(){
+    SceneObject.nextId++;
+    this.id = SceneObject.nextId;
     this.onStart();
     this.transform =this.components['transform'] = new Transform();
   }
@@ -34,7 +38,7 @@ export class SceneObject{
   }
 
   render(gl, camera){
-    //obj passa posizione, rotatione e scaling
+    //obj passes position, rotation and scaling
     for(let mesh of this.meshes){
       let transformToRender;
 

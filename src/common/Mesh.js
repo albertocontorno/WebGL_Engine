@@ -6,6 +6,7 @@ import {ShaderProgram} from './ShaderProgram';
  * @class
  */
 export class Mesh{
+  static nextId = 0;
   vertices;
   indices;
   shaders = {vertex: null, fragment: null, program: null}
@@ -15,8 +16,9 @@ export class Mesh{
   EBO;
   type;
   locations = {};
-  constructor(gl, vertices, indices, shaders, id, opt){
-    this.id = id;
+  constructor(gl, vertices, indices, shaders, opt){
+    Mesh.nextId++;
+    this.id = Mesh.nextId;
     this.vertices = vertices;
     this.indices = indices;
     this.shaders = shaders;
@@ -44,10 +46,6 @@ export class Mesh{
     let positionLoc = gl.getAttribLocation(this.shaders.program.program, 'vPosition');
     gl.vertexAttribPointer(positionLoc, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionLoc);
-
-    /* let positionLoc = gl.getAttribLocation(this.shaders.program.program, 'vPosition');
-    gl.vertexAttribPointer(positionLoc, 3, gl.FLOAT, false, 32, 0);
-    gl.enableVertexAttribArray(positionLoc); */
 
     /* let normalLoc = gl.getAttribLocation(this.shaders.program.program, 'vNormal');
     gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 32, 12);

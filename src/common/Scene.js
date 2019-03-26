@@ -3,10 +3,17 @@
  * @class
  */
 export class Scene{
+  static nextId = 0;
+  id;
   objects = [];
   objectsMap = {};
   cameras = [];
   mainCamera;
+
+  constructor(){
+    Scene.nextId++;
+    this.id = Scene.nextId;
+  }
 
   addCamera(camera){
     this.cameras.push(camera);
