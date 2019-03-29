@@ -28,7 +28,7 @@ var camera = new Camera(vec3(0, 0, 0), up, 5, "perspective", {},
 gl.enable(gl.DEPTH_TEST);
 gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 gl.clearColor(0.0, 0.0, 0.0, 1.0);
-var engine = new Engine(gl);
+var engine = new Engine(gl, {showFps: true});
 var scene = new Scene();
 engine.addScene(scene);
 scene.addCamera(camera);

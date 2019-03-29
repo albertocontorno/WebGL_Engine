@@ -12,12 +12,13 @@ export class Engine{ //TODO SCENE MANAGER
     activeScene;
     gl;
     time;
+    opt;
     /**
      * Create a new Engine and do the setup of all the environment.
      * @param {WebGL_Context} gl The WebGl context obtained from a canvas. This will be the context of the entire Engine.
      * used as the context of every Shader.
      */
-    constructor(gl){
+    constructor(gl, opt){
       Math.radians = degrees => {
         var pi = Math.PI;
         return degrees * (pi / 180);
@@ -28,7 +29,14 @@ export class Engine{ //TODO SCENE MANAGER
       };
       this.gl = gl;
       this.time = new Time();
+      this.opt = opt;
       ShaderUtils.setGlContext(this.gl);
+
+      if(this.opt){
+        if(this.opt.showFps){
+          this.setFpsCounter();
+        }
+      }
     }
 
     /**
@@ -58,5 +66,21 @@ export class Engine{ //TODO SCENE MANAGER
       }
       this.time.updateTime();
       window.requestAnimationFrame(this.doRendering.bind(this));
+    }
+
+    setFpsCounter(){
+      let container = document.createElement('div');
+      let idNum = Math.round(Math.random(0, 1) * 100);
+      container.setAttribute("style",
+      `position: absolute;
+      top: 10px;
+      left: 20px;
+      color: yellow;`);
+      container.id = 'glFpsCounterContainer_' + idNum;
+      let text = document.createElement('p');
+      text.id = 'glFpsCounterText_'+ idNum;
+      container.appendChild(text);
+      document.body.appendChild(container);
+      this.time.subscribeFps(() => { text.innerHTML = 'FPS: ' + this.time.frames; })
     }
 }
