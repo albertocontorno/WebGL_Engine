@@ -29,6 +29,12 @@ export class SceneObject{
   }
   
   addMesh(mesh){
+    for (let m of this.meshes) {
+      if (m.id === mesh.id) {
+        console.warning('[WARNING - Object](addMesh) - Added mesh is already present.');
+        return;
+      }
+    }
     this.meshes.push(mesh);
   }
 

@@ -4,15 +4,14 @@
 
 import "./styles.css";
 import { WebGLUtils } from "./common/webgl-utils";
-import { ShaderUtils } from "./common/shadersUtils";
 import * as triangleShaders from "./shaders/triangleShader";
 import { InputManager } from "./common/inputManager";
-import { Time } from "./common/Time";
 import { Camera } from "./common/Camera";
 import { Mesh } from "./common/Mesh";
 import { Engine } from "./common/Engine";
 import { SceneObject } from "./common/Object";
 import { Scene } from "./common/Scene";
+import { Texture } from "./common/Texture";
 
 var inputs = new InputManager();
 //var time = new Time();
@@ -35,15 +34,37 @@ engine.addScene(scene);
 scene.addCamera(camera);
 
 let vertices = [
-  vec4(-0.5, -0.5, 0.5, 1.0), //l b
-  vec4(-0.5, 0.5, 0.5, 1.0), //l t
-  vec4(0.5, -0.5, 0.5, 1.0), //r b
-  vec4(0.5, 0.5, 0.5, 1.0), //r t
+  vec4(-0.5, -0.5, 0.5, 1.0), //l b 0 0
+  vec4(-0.5, 0.5, 0.5, 1.0), //l t  0 1
+  vec4(0.5, -0.5, 0.5, 1.0), //r b 1 0
+  vec4(0.5, 0.5, 0.5, 1.0), //r t 1 1
 
-  vec4(-0.5, -0.5, -0.5, 1.0), //4 l b
+  vec4(-0.5, -0.5, -0.5, 1.0), //4 l b 
   vec4(-0.5, 0.5, -0.5, 1.0), //5 l t
   vec4(0.5, -0.5, -0.5, 1.0), //6 r b
   vec4(0.5, 0.5, -0.5, 1.0) //7 r t
+];
+
+/* var floorTextCoords = [
+  vec2(0, 0),
+  vec2(0, 1),
+  vec2(1, 0),
+  vec2(1, 1),
+  vec2(0, 0),
+  vec2(0, 1),
+  vec2(1, 0),
+  vec2(1, 1)
+]; */
+
+var floorTextCoords = [
+  vec2(0, 0),
+  vec2(0, 0),//
+  vec2(1,0),
+  vec2(1, 0),//
+  vec2(0, 1),
+  vec2(0, 1),//
+  vec2(1, 1),
+  vec2(1, 1)//
 ];
 
 let indices = [
@@ -105,13 +126,17 @@ var obj2 = new SceneObject();
 var obj3 = new SceneObject();
 
 var floor = new SceneObject();
-floor.transform.position = [0, -1, 0];
+floor.transform.position = [0, -0.75, 0];
 floor.transform.scale = [5, 0.5, 5];
-floor.addMesh(
-  new Mesh(gl, vertices, indices,
-    { vertex: triangleShaders.vertexShader, fragment: triangleShaders.fragmentShader }
-  )
+let floorMesh = new Mesh(gl, vertices, indices,
+  { vertex: triangleShaders.vertexShader, fragment: triangleShaders.fragmentShader }, null, null,
+  floorTextCoords
 );
+var textureFloor = new Texture(0, null, 'src/shaders/download.jpg', gl.RGB, gl.RGB);
+textureFloor.LoadTexture(gl);
+floorMesh.textures.push(textureFloor);
+floor.addMesh(floorMesh);
+
 
 scene.addObject(floor);
 scene.addObject(obj);
@@ -128,7 +153,7 @@ let cube3 = new Mesh(gl, vertices, indices,
 );
 
 obj.addMesh(cube);
-obj.transform.rotation = [45, 0, 45];
+obj.transform.rotation = [0, 0, 0];
 
 obj2.addMesh(cube2);
 obj2.transform.position = [2, 0, 0];
@@ -140,12 +165,12 @@ obj3.transform.position = [-1, 0, -2];
 obj3.transform.scale = [1, 1, 2];
 //obj.addMesh(cube3);
 console.log(engine);
-console.log(obj);
 
 var gameManager = new SceneObject();
 gameManager.onUpdate =  function(){
   handleInputs();
   inputs.clearMousePosition();
+  obj.transform.rotation[1] += 0.1;
 }
 scene.addObject(gameManager);
 
