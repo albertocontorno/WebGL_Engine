@@ -1,5 +1,5 @@
 import { Transform } from './Components/Transform';
-import { registeredComponents } from './Component';
+import { registeredComponents, Component } from './Component';
 
 /**
  * @author Alberto Contorno
@@ -8,6 +8,7 @@ import { registeredComponents } from './Component';
 export class SceneObject{
   static nextId = 0;
   id;
+  scene;
   components = {};
   transform;
   meshes = []; //model
@@ -21,11 +22,11 @@ export class SceneObject{
 
   onDestroy = () => {};
 
-  constructor(){
+  constructor(startCallback){
     SceneObject.nextId++;
     this.id = SceneObject.nextId;
-    this.onStart();
-    this.transform =this.components['transform'] = new Transform();
+    this.onStart = startCallback;
+    this.transform = this.components['transform'] = new Transform(this);
   }
   
   addMesh(mesh){
@@ -58,7 +59,13 @@ export class SceneObject{
     }
   }
 
+  /**
+   * 
+   * @param {Component} component 
+   */
   addComponent(component){
     this.components[component.name] = component;
+    component.parent = this;
+    component.onAfterAdded(this, this.scene);
   }
 }

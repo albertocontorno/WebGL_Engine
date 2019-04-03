@@ -29,5 +29,9 @@ export class Shader{
     equals(other){
       return this.id === other.id;
     }
+
+    destroy(gl){
+
+    }
     
 }

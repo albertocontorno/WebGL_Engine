@@ -17,8 +17,8 @@ export class Mesh{
   type;
   locations = {};
   textures = [];
+  normals;
   material;
-  
   textCoords;
   constructor(gl, vertices, indices, shaders, opt, textures, textCoords){
     Mesh.nextId++;
@@ -89,11 +89,13 @@ export class Mesh{
   setupShadersAndProgram(gl){
     this.shaders.vertex = new Shader(gl, 'vertex', this.shaders.vertex);
     if (this.shaders.vertex.errors.lenght > 0){
+      this.destroyShader(this.shaders.fragment, gl);
       console.error('error vertex', this.shaders.vertex.errors);
       return;
     }
     this.shaders.fragment = new Shader(gl, 'fragment', this.shaders.fragment);
     if (this.shaders.fragment.errors.lenght > 0) {
+      this.destroyShader(this.shaders.fragment);
       console.error("error fragment", this.shaders.fragment.errors);
       return;
     }
@@ -107,12 +109,17 @@ export class Mesh{
 
     this.shaders.program = new ShaderProgram(gl, shaders);
     if (this.shaders.program.errors.length > 0) {
+      this.destroyProgram(this.shaders.program, gl);
       console.error('error in linking program', this.shaders.program.errors);
       return;
     }
 
     //TODO
     //gli shader source non servono più, eliminabili
+    if (this.opt && !this.opt.keepData) {
+      this.shaders.vertex= null;
+      this.shaders.fragment = null;
+    }
     //se qualcosa non va bene distruggere shaders e program
   }
 
@@ -171,5 +178,22 @@ export class Mesh{
 
     gl.bindVertexArray(null);
     gl.useProgram(null);
+  }
+
+  destroyShader(shader, gl){
+
+  }
+
+  destroyShaders(gl){
+
+  }
+
+  destroyProgram(program, gl){
+
+  }
+
+  destroy(gl){
+    this.destroyProgram(gl);
+    this.destroyShaders(gl);
   }
 }

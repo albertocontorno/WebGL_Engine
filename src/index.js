@@ -4,15 +4,16 @@
 
 import "./styles.css";
 import { WebGLUtils } from "./common/webgl-utils";
+import { Engine } from "./common/Engine";
 import * as triangleShaders from "./shaders/triangleShader";
 import { InputManager } from "./common/inputManager";
-import { Camera } from "./common/Camera";
-import { Mesh } from "./common/Mesh";
-import { Engine } from "./common/Engine";
-import { SceneObject } from "./common/Object";
 import { Scene } from "./common/Scene";
+import { Camera } from "./common/Camera";
+import { SceneObject } from "./common/Object";
+import { Mesh } from "./common/Mesh";
 import { Texture } from "./common/Texture";
-
+import { DirectionalLight } from "./common/Components/DirectionalLight";
+import { PointLight } from './common/Components/PointLight';
 var inputs = new InputManager();
 //var time = new Time();
 const up = vec3(0.0, 1.0, 0.0);
@@ -44,17 +45,6 @@ let vertices = [
   vec4(0.5, -0.5, -0.5, 1.0), //6 r b
   vec4(0.5, 0.5, -0.5, 1.0) //7 r t
 ];
-
-/* var floorTextCoords = [
-  vec2(0, 0),
-  vec2(0, 1),
-  vec2(1, 0),
-  vec2(1, 1),
-  vec2(0, 0),
-  vec2(0, 1),
-  vec2(1, 0),
-  vec2(1, 1)
-]; */
 
 var floorTextCoords = [
   vec2(0, 0),
@@ -112,6 +102,12 @@ function handleInputs() {
     if (inputs.isKeyDown(inputs.keyCodes.KEYNAMES.w)) {
       camera.moveForward(engine.time.deltaTime);
     }
+
+    if(inputs.isKeyDown(inputs.keyCodes.KEYNAMES.q)){
+      obj3.transform.rotation[0] +=4;
+      obj3.transform.rotation[1] += 5;
+      obj3.transform.rotation[2] += 4;
+    }
   }
 
   camera.updateCameraDirection(
@@ -165,12 +161,16 @@ obj3.transform.position = [-1, 0, -2];
 obj3.transform.scale = [1, 1, 2];
 //obj.addMesh(cube3);
 console.log(engine);
-
+let dirLight = new DirectionalLight();
+let pointLight = new PointLight();
+obj3.addComponent(dirLight);
+obj3.addComponent(pointLight);
 var gameManager = new SceneObject();
 gameManager.onUpdate =  function(){
   handleInputs();
   inputs.clearMousePosition();
   obj.transform.rotation[1] += 0.1;
+  obj3.transform.rotation[1] += 0.1;
 }
 scene.addObject(gameManager);
 

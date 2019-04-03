@@ -59,10 +59,7 @@ export class Engine{ //TODO SCENE MANAGER
       this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
       this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
       if (this.scenes[this.activeScene] && this.scenes[this.activeScene].mainCamera){
-          for (let obj of this.scenes[this.activeScene].objects){
-              obj.onUpdate();
-              obj.render(this.gl, this.scenes[this.activeScene].mainCamera);
-          }
+        this.scenes[this.activeScene].renderScene(this.gl);
       }
       this.time.updateTime();
       window.requestAnimationFrame(this.doRendering.bind(this));

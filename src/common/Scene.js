@@ -1,3 +1,6 @@
+import { SceneObject } from "./Object";
+import { Camera } from "./Camera";
+
 /**
  * @author Alberto Contorno
  * @class
@@ -12,12 +15,17 @@ export class Scene{
   objectsMap = {};
   cameras = [];
   mainCamera;
+  lights = [];
 
   constructor(){
     Scene.nextId++;
     this.id = Scene.nextId;
   }
 
+  /**
+   * 
+   * @param {Camera} camera 
+   */
   addCamera(camera){
     for(let cam of this.cameras){
       if(cam.id === camera.id){
@@ -31,6 +39,10 @@ export class Scene{
     }
   }
 
+  /**
+   * 
+   * @param {Camera} camera 
+   */
   setMainCamera(camera){
     this.mainCamera = camera;
     let alreadyPresent = false;
@@ -45,11 +57,20 @@ export class Scene{
     }
   }
 
+  /**
+   * 
+   * @param {SceneObject} obj 
+   */
   addObject(obj){
     this.objects.push(obj);
+    obj.scene = this;
     this.objectsMap[obj.id] = this.objects.length - 1;
   }
 
+  /**
+   * 
+   * @param {SceneObject} obj 
+   */
   removeObject(obj){
     if(typeof obj === 'object'){
       if (this.objectsMap[this.objectsMap[obj.id]] != null){
@@ -60,6 +81,18 @@ export class Scene{
       if (this.objects[obj] != null){
         this.objects[obj] = null;
       }
+    }
+  }
+
+  registerLight(type, light){
+    this.lights.push({ parentObj: light.parent, type, light });
+    console.log(this.lights);
+  }
+
+  renderScene(gl){
+    for (let obj of this.objects) {
+      obj.onUpdate();
+      obj.render(gl, this.mainCamera);
     }
   }
 
