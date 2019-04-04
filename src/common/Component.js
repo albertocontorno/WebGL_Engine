@@ -3,9 +3,15 @@
  * @class
  */
 export class Component{
+    static nextId = 1;
     name;
     parent;
 
+    constructor(){
+        Component.nextId++;
+        this.id = Component.nextId;
+    }
+    
     onAfterAdded() {}
 }
 

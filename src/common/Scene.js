@@ -9,7 +9,7 @@ import { Camera } from "./Camera";
  * Moreover it has an array of cameras that can be used, of which, one is the main camera used to render.
  */
 export class Scene{
-  static nextId = 0;
+  static nextId = 1;
   id;
   objects = [];
   objectsMap = {};

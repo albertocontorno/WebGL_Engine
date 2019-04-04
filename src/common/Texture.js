@@ -4,7 +4,7 @@
  * Class that represents a single Texture of a Mesh.
  */
 export class Texture{
-    static nextId = 0;
+    static nextId = 1;
 
     id;
     textureUnit = 0;

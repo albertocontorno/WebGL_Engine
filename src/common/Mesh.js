@@ -6,7 +6,7 @@ import {ShaderProgram} from './ShaderProgram';
  * @class
  */
 export class Mesh{
-  static nextId = 0;
+  static nextId = 1;
   vertices;
   indices;
   shaders = {vertex: null, fragment: null, program: null}

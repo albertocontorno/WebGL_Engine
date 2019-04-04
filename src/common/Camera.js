@@ -6,6 +6,7 @@
  * default view matrices ('ortho', 'perspective').
  */
 export class Camera{
+  static nextId = 1;
 
   position = vec3(0, 0, 0);
   rotation = vec3(0, 0, 0);
@@ -48,6 +49,8 @@ export class Camera{
    * @param {object} zooms An object containing all the zoom levels in the form {0: fov0, 1: fov1} (only for 'perspective' cameras)
    */
   constructor(position, up, speed, type, moveKeys, projOptions, sensitivity, zooms){
+    Camera.nextId++;
+    this.id = Camera.nextId;
     this.sensitivity = sensitivity;
     this.speed = speed;
     this.position = position;

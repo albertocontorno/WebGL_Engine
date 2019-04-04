@@ -5,6 +5,7 @@
  * of the Phong Lighting.
  */
 export class Material{
+    static nextId = 1;
     ambient;
     diffuse;
     specular;
@@ -17,6 +18,8 @@ export class Material{
      * @param {vec3} diffuse The shininess level of the objcet (a power of 2 (eg. 32, 64 ...))
      */
     constructor(ambient, diffuse, specular, shininess){
+        Material.nextId++;
+        this.id = Material.nextId;
         this.ambient = ambient;
         this.diffuse = diffuse;
         this.specular = specular;

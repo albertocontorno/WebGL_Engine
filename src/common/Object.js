@@ -6,7 +6,7 @@ import { registeredComponents, Component } from './Component';
  * @class
  */
 export class SceneObject{
-  static nextId = 0;
+  static nextId = 1;
   id;
   scene;
   components = {};
