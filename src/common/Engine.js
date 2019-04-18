@@ -46,6 +46,7 @@ export class Engine{ //TODO SCENE MANAGER
      */
     addScene(scene){
       this.scenes.push(scene);
+      scene.onAfterSceneAdded(this);
       if (!this.activeScene){
         this.activeScene = this.scenes.length - 1;
       }

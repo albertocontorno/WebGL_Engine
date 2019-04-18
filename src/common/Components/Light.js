@@ -1,24 +1,20 @@
 import {Component} from '../Component';
 import { SceneObject } from '../Object';
 import { Scene } from '../Scene';
-
-const lightTypes = {
-    DirectionalLight: 'DIRECTIONAL_LIGHT',
-    PointLight: 'POINTLIGHT',
-    SpotLight: 'SPOTLIGHT'
-}
+import { LightTypes } from '../Utils/constants';
+import { vec3 } from "../Utils/Vector_Matrix";
+const lightTypes = LightTypes;
 /**
  * @author Alberto Contorno
  * @class
  * Components that makes the object to which it is attached a source light.
  */
 export class Light extends Component{
-
-    
-
-    diffuse = [1, 1, 1];
-    ambient = [0.5, 0.5, 0.5];
-    specular = [0.5, 0.5, 0.5];
+    static nextId = 1;
+    id;
+    diffuse = vec3(0.5,0.5,0.5);
+    ambient = vec3(0.1, 0.1, 0.1);
+    specular = vec3(0.8, 0.8, 0.8);
     /**
      * 
      * @param {vec3} diffuse Diffuse component of the light
@@ -26,6 +22,8 @@ export class Light extends Component{
      * @param {vec3} specular Specular component of the light
      */
     constructon(diffuse, ambient, specular){
+        this.id = Light.nextId;
+        Light.nextId++;
         this.name = 'Light';
         console.log("DIFFUSEE?? ", diffuse)
         this.diffuse = diffuse;
@@ -40,5 +38,9 @@ export class Light extends Component{
      */
     onAfterAdded(parent, scene){
         scene.registerLight(lightTypes[this.constructor.name], this);
+    }
+
+    onAfterRemoved(parent, scene){
+        scene.unregisterLight(lightTypes[this.constructor.name], this);
     }
 }

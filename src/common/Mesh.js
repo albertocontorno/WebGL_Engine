@@ -1,6 +1,8 @@
 import {Shader} from './Shader';
 import {ShaderProgram} from './ShaderProgram';
-
+import { vec3, flatten, mat4, translate, rotate, rotateX, rotateY, rotateZ, scalem, mult } from './Utils/Vector_Matrix';
+import { Material } from './Material';
+import { LightTypes } from "./Utils/constants";
 /**
  * @author Alberto Contorno
  * @class
@@ -9,29 +11,46 @@ export class Mesh{
   static nextId = 1;
   vertices;
   indices;
-  shaders = {vertex: null, fragment: null, program: null}
+  shaders = {vertex: null, fragment: null, program: null, set: false}
   id;
   VAO;
   VBO;
   EBO;
+  NBO;
   type;
   locations = {};
   textures = [];
   normals;
   material;
   textCoords;
-  constructor(gl, vertices, indices, shaders, opt, textures, textCoords){
+  /*
+    opt : keepData, autoUpdateShaders, shadersShouldUpdate
+  */
+  /**
+   * 
+   * @param {*} gl 
+   * @param {*} vertices 
+   * @param {*} indices 
+   * @param {{ vertex: string, fragment: string }} shaders
+   * @param {*} opt 
+   * @param {*} textures 
+   * @param {*} textCoords 
+   */
+  constructor(gl, vertices, indices, shaders, opt, textures, textCoords, normals){
     Mesh.nextId++;
     this.id = Mesh.nextId;
     this.vertices = vertices;
     this.indices = indices;
-    this.shaders = shaders;
     this.opt = opt || { keepData: true };
     this.type = this.opt.type || gl.TRIANGLES;
     this.textures = textures || [];
     this.textCoords = textCoords;
-    this.setupShadersAndProgram(gl);
-    this.createAndLoadBuffers(gl);
+    this.normals = normals;
+    if(shaders){
+      this.shaders = shaders;
+      this.setupShadersAndProgram(gl);
+      this.createAndLoadBuffers(gl);
+    }
     console.log('MESH CREATED_'+this.id, this);
   }
 
@@ -42,16 +61,26 @@ export class Mesh{
     this.VBO = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VBO);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(this.vertices), gl.STATIC_DRAW);
-    
+
+    let positionLoc = gl.getAttribLocation(this.shaders.program.program, 'vPosition');
+    gl.vertexAttribPointer(positionLoc, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(positionLoc);
+
     if (this.indices) {
       this.EBO = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.EBO);
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW);
     }
 
-    let positionLoc = gl.getAttribLocation(this.shaders.program.program, 'vPosition');
-    gl.vertexAttribPointer(positionLoc, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(positionLoc);
+    /* if(this.normals){
+      this.NBO = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.NBO);
+      gl.bufferData(gl.ARRAY_BUFFER, flatten(this.normals), gl.STATIC_DRAW);
+      let normalLoc = gl.getAttribLocation(this.shaders.program.program, 'vNormal');
+      gl.enableVertexAttribArray(normalLoc);
+      gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 0, 0);
+    } */
+
     
     if (this.textCoords){
       this.textCoordBuffer = gl.createBuffer();
@@ -75,7 +104,7 @@ export class Mesh{
     this.locations.viewLoc = gl.getUniformLocation(this.shaders.program.program, 'view');
     this.locations.projLoc = gl.getUniformLocation(this.shaders.program.program, 'projection');
 
-    gl.bindVertexArray(null);
+    this.unbindVAO(gl);
     //TODO
     //in teoria this.vertices, e this.indices non serve più e possiamo tenerci solo la this.indices.lenght
     //se servono usiamo un flag per decidere di tenerli
@@ -84,6 +113,14 @@ export class Mesh{
       this.indices = null;
     }
 
+  }
+
+  setupLocations(){
+
+  }
+
+  unbindVAO(gl){
+    gl.bindVertexArray(null);
   }
 
   setupShadersAndProgram(gl){
@@ -101,8 +138,8 @@ export class Mesh{
     }
 
     let shaders = [];
-    for( let key in this.shaders){
-      if (key != 'program'){
+    for(let key in this.shaders){
+      if (key != 'program' && key != 'set'){
         shaders.push(this.shaders[key].shader);
       }
     }
@@ -147,13 +184,13 @@ export class Mesh{
     return modelMatrix;
   }
 
-  render(gl, camera, transform = {}, type, material) {
+  render(gl, camera, transform = {}, type, material, lights) {
 
     gl.useProgram(this.shaders.program.program);
     gl.bindVertexArray(this.VAO);
 
     let modelMatrix = this.getModelMatrix(transform);
-    let projMatrix = camera.getProjectionMatrix(); //TODO lo fara l'engine
+    let projMatrix = camera.getProjectionMatrix();
     let viewMatrix = camera.getViewMatrix();
 
     if (this.locations.modelLoc) {
@@ -167,14 +204,84 @@ export class Mesh{
     }
 
     this.textures.forEach(texture => {
-      if (texture) texture.UseTexture(gl);
+      if (texture) texture.ActiveTexture(gl);
     });
 
     if (this.indices) {//draw elements
       gl.drawElements(type || gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
     } else { //draw arrays
-      gl.drawArrays(type || gl.TRIANGLES, 0, this.vertices.length/4);
+      gl.drawArrays(type || gl.TRIANGLES, 0, this.vertices.length);
     }
+
+    this.textures.forEach(texture => {
+      if (texture) texture.DisactiveTexture(gl);
+    });
+    
+    gl.bindVertexArray(null);
+    gl.useProgram(null);
+  }
+
+  renderDefault(gl, camera, transform = {}, type, material, lights, defaultShader, locs){
+    gl.bindVertexArray(this.VAO);
+    gl.useProgram(defaultShader.program.program);
+
+    let modelMatrix = this.getModelMatrix(transform);
+    let projMatrix = camera.getProjectionMatrix();
+    let viewMatrix = camera.getViewMatrix();
+
+    if (this.normals) {
+      this.NBO = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.NBO);
+      gl.bufferData(gl.ARRAY_BUFFER, flatten(this.normals), gl.STATIC_DRAW);
+      let normalLoc = gl.getAttribLocation(defaultShader.program.program, 'vNormal');
+      gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(normalLoc);
+    }
+
+    if (locs.modelLoc) {
+      gl.uniformMatrix4fv(locs.modelLoc, false, flatten(modelMatrix));
+    }
+    if (locs.viewLoc) {
+      gl.uniformMatrix4fv(locs.viewLoc, false, flatten(viewMatrix));
+    }
+    if (locs.projLoc) {
+      gl.uniformMatrix4fv(locs.projLoc, false, flatten(projMatrix));
+    }
+    if (locs.viewPosLoc) {
+      gl.uniform3fv(locs.viewPosLoc, camera.getFrontVector());
+    }
+    if (locs.materialLocs){
+      if (!material){ material = new Material(); }
+      gl.uniform3fv(locs.materialLocs.ambient, flatten(material.ambient));
+      gl.uniform3fv(locs.materialLocs.diffuse, material.diffuse);
+      gl.uniform3fv(locs.materialLocs.specular, material.specular);
+      gl.uniform1f(locs.materialLocs.shininess, material.shininess);
+    }
+    if (locs.lights){
+      for (let i = 0; i < locs.lights.length; i++){
+        if (locs.lights[i].type === LightTypes.DirectionalLight) {
+          this.setupDirectionalLight(gl, locs.lights[i], lights[i]);
+        } else if (locs.lights[i].type === LightTypes.PointLight) {
+          this.setupPointLight(gl, locs.lights[i], lights[i]);
+        } else if (locs.lights[i].type === LightTypes.SpotLight) {
+          this.setupSpotLight(gl, locs.lights[i], lights[i]);
+        }
+      }
+    }
+
+    this.textures.forEach(texture => {
+      if (texture) texture.ActiveTexture(gl);
+    });
+
+    if (this.indices) {//draw elements
+      gl.drawElements(type || gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+    } else { //draw arrays
+      gl.drawArrays(type || gl.TRIANGLES, 0, this.vertices.length);
+    }
+
+    this.textures.forEach(texture => {
+      if (texture) texture.DisactiveTexture(gl);
+    });
 
     gl.bindVertexArray(null);
     gl.useProgram(null);
@@ -183,6 +290,7 @@ export class Mesh{
   destroyShader(shader, gl){
 
   }
+
 
   destroyShaders(gl){
 
@@ -195,5 +303,35 @@ export class Mesh{
   destroy(gl){
     this.destroyProgram(gl);
     this.destroyShaders(gl);
+  }
+
+  setupDirectionalLight(gl, lightLocs, light){
+    gl.uniform3fv(lightLocs.ambient, light.light.ambient);
+    gl.uniform3fv(lightLocs.diffuse, light.light.diffuse);
+    gl.uniform3fv(lightLocs.specular, light.light.specular);
+    gl.uniform3fv(lightLocs.direction, light.light.direction);
+  }
+
+  setupPointLight(gl, lightLocs, light) {
+    gl.uniform3fv(lightLocs.position, light.light.position);
+    gl.uniform3fv(lightLocs.ambient, light.light.ambient);
+    gl.uniform3fv(lightLocs.diffuse, light.light.diffuse);
+    gl.uniform3fv(lightLocs.specular, light.light.specular);
+    gl.uniform1f(lightLocs.constant, light.light.constant);
+    gl.uniform1f(lightLocs.linear, light.light.linear);
+    gl.uniform1f(lightLocs.quadratic, light.light.quadratic);
+  }
+
+  setupSpotLight(gl, lightLocs, light) {
+    gl.uniform3fv(lightLocs.position, light.light.position);
+    gl.uniform3fv(lightLocs.ambient, light.light.ambient);
+    gl.uniform3fv(lightLocs.diffuse, light.light.diffuse);
+    gl.uniform3fv(lightLocs.specular, light.light.specular);
+    gl.uniform1f(lightLocs.constant, light.light.constant);
+    gl.uniform1f(lightLocs.linear, light.light.linear);
+    gl.uniform1f(lightLocs.quadratic, light.light.quadratic);
+    gl.uniform1f(lightLocs.cutOff, light.light.cutOff);
+    gl.uniform1f(lightLocs.outerCutOff, light.light.outerCutOff);
+    gl.uniform3fv(lightLocs.direction, light.light.direction);
   }
 }

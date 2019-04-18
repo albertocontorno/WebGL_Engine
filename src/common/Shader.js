@@ -23,7 +23,7 @@ export class Shader{
       if (shaderError) { 
         console.log("err",shaderError);
         this.errors.push(shaderError); 
-        }
+      }
     }
 
     equals(other){

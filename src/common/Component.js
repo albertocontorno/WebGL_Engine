@@ -11,8 +11,10 @@ export class Component{
         Component.nextId++;
         this.id = Component.nextId;
     }
-    
+
     onAfterAdded() {}
+
+    onAfterRemoved() {}
 }
 
 export const registeredComponents = {

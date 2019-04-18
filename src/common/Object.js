@@ -1,5 +1,6 @@
 import { Transform } from './Components/Transform';
 import { registeredComponents, Component } from './Component';
+import { Camera } from './Camera';
 
 /**
  * @author Alberto Contorno
@@ -15,14 +16,14 @@ export class SceneObject{
   children = [];
   parent;
   material;
-
+  name;
   onStart = () => {};
 
   onUpdate = () => {};
 
   onDestroy = () => {};
 
-  constructor(startCallback){
+  constructor(startCallback, name){ this.name =name;
     SceneObject.nextId++;
     this.id = SceneObject.nextId;
     this.onStart = startCallback;
@@ -44,7 +45,13 @@ export class SceneObject{
     child.parent = this;
   }
 
-  render(gl, camera){
+  /**
+   * 
+   * @param {GL_CONTEXT} gl 
+   * @param {Camera} camera 
+   * @param {*} lights 
+   */
+  render(gl, camera, lights, defaultShader, locs){
     //obj passes position, rotation and scaling
     for(let mesh of this.meshes){
       let transformToRender;
@@ -54,8 +61,11 @@ export class SceneObject{
       } else {
         transformToRender = this.transform;
       }
-
-      mesh.render(gl, camera, transformToRender, this.type, this.material);
+      if (mesh.shaders && mesh.shaders.set) {
+        mesh.render(gl, camera, transformToRender, this.type, this.material, lights, defaultShader, locs);
+      } else {
+        mesh.renderDefault(gl, camera, transformToRender, this.type, this.material, lights, defaultShader, locs)
+      }
     }
   }
 
@@ -64,8 +74,27 @@ export class SceneObject{
    * @param {Component} component 
    */
   addComponent(component){
+    if (!component) {
+      console.warn('[WARNING - SCENE_OBJECT](addComponent) - Trying to add a component but no component provided.');
+      return;
+    }
     this.components[component.name] = component;
     component.parent = this;
     component.onAfterAdded(this, this.scene);
   }
+
+  /**
+   * 
+   * @param {Component} component 
+   */
+  removeComponent(component){
+    if(!component){
+      console.warn('[WARNING - SCENE_OBJECT](addComponent) - Trying to add a component but no component provided.');
+      return;
+    }
+    this.components[component.name] = null;
+    component.parent = null;
+    component.onAfterRemoved(this, this.scene);
+  }
+
 }

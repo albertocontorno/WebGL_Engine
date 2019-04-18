@@ -22,10 +22,19 @@ void main(){
 export const fragmentShader = `#version 300 es
 precision mediump float;
 in vec4 color;
+in vec3 fNormal;
 in vec2 textCoord;
 out vec4 fragColor;
 uniform sampler2D texture0;
 void main(){
-    fragColor =  mix(texture(texture0, textCoord) , color, 0.3);
+    vec4 tColor = texture(texture0, textCoord);
+    /*if(tColor.x == 0.0 && tColor.y == 0.0 && tColor.z == 0.0){
+        tColor.x = 1.0;
+        tColor.y = 1.0;
+        tColor.z = 1.0;
+    }*/
+    tColor.a = 1.0;
+    
+    fragColor = tColor  * color;
 }
 `;

@@ -1,3 +1,5 @@
+import { vec3, perspective, ortho, lookAt, scale, add, subtract, normalize, cross } from "./Utils/Vector_Matrix";
+
 /**
  * @author Alberto Contorno
  * @class
@@ -69,7 +71,7 @@ export class Camera{
       //this.updateCameraPos = this._updateCameraPos;
     } else if (type && type === 'orthographic'){
       this.proj = ortho(this.projOptions.left, this.projOptions.right, this.projOptions.bottom, this.projOptions.ytop, this.projOptions.near, this.projOptions.far);
-      this.updateCameraDirection = () => {};
+      this.updateCameraDirection = this._updateCameraDirection;
     }
   }
 
@@ -79,16 +81,22 @@ export class Camera{
   getProjectionMatrix(){
     return this.proj;
   }
-/**
- * Return the View Matrix of the camera.
- */
-  getViewMatrix(){
-    this.front = vec3(
+
+  /**
+   * Return the front vector of the camera;
+   */
+  getFrontVector(){
+    return vec3(
       this.position[0] + this.direction[0],
       this.position[1] + this.direction[1],
       this.position[2] + this.direction[2]
     );
-    return lookAt(this.front, this.position, this.up);
+  }
+/**
+ * Return the View Matrix of the camera.
+ */
+  getViewMatrix(){
+    return lookAt(this.getFrontVector(), this.position, this.up);
   }
 /**
  * It updates the direction of the camera.

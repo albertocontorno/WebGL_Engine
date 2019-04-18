@@ -26,12 +26,20 @@ export class Texture{
     constructor(textureUnit, type, imagePath, s_texelType, texelType, params){
         Texture.nextId++;
         this.id = Texture.nextId;
-        this.textureUnit = textureUnit;
+        this.textureUnit = textureUnit || 0;
         this.type = type;
         this.imagePath = imagePath;
         this.s_texelType = s_texelType;
         this.texelType = texelType;
         this.params = params;
+    }
+
+    CreateTextureFromArray(gl){
+        this.texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, this.texelType, 1, 1,
+            0, this.s_texelType, gl.UNSIGNED_BYTE, new Uint8Array([255, 255, 255, 255]));
+        gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
     LoadTexture(gl){
@@ -47,19 +55,32 @@ export class Texture{
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texImage2D(gl.TEXTURE_2D, 0, this.texelType, 1, 1,
             0, this.s_texelType, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));
+        gl.bindTexture(gl.TEXTURE_2D, null);
         let _loaded = () => {
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
             console.log("TEXTURE LOADED", this.textureSource.width);
             gl.texImage2D(gl.TEXTURE_2D, 0, this.texelType, this.textureSource.width, this.textureSource.height,
                 0, this.s_texelType, gl.UNSIGNED_BYTE, this.textureSource);
             gl.generateMipmap(gl.TEXTURE_2D);
             this.textureSource.removeEventListener('load', _loaded);
             this.textureSource = null;
+            gl.bindTexture(gl.TEXTURE_2D, null);
         }
         this.textureSource.addEventListener('load', _loaded);  
     }
 
-    UseTexture(gl){
+    UseTexture(gl, textureUnit){
+        gl.activeTexture(gl.TEXTURE0 + textureUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    }
+
+    ActiveTexture(gl){
+        gl.activeTexture(gl.TEXTURE0 + this.textureUnit);
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    }
+
+    DisactiveTexture(gl){
+        gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
 
