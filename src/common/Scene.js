@@ -170,7 +170,7 @@ export class Scene{
 
     this.defaultShaders = shaders;
     this.setupLocations(gl);
-    console.log("SCENE SHADERS", this.defaultShaders, this.emptyTextures);
+    console.log("SCENE DEFAULT SHADERS", this.defaultShaders, this.emptyTextures);
   }
 
   setupLocations(gl){

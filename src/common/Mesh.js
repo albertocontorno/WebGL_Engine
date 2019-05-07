@@ -46,11 +46,11 @@ export class Mesh{
     this.textures = textures || [];
     this.textCoords = textCoords;
     this.normals = normals;
-    if(shaders){
-      this.shaders = shaders;
-      this.setupShadersAndProgram(gl);
-      this.createAndLoadBuffers(gl);
-    }
+
+    this.shaders = shaders;
+    this.setupShadersAndProgram(gl);
+    this.createAndLoadBuffers(gl);
+    
     console.log('MESH CREATED_'+this.id, this);
   }
 
@@ -71,16 +71,6 @@ export class Mesh{
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.EBO);
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW);
     }
-
-    /* if(this.normals){
-      this.NBO = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.NBO);
-      gl.bufferData(gl.ARRAY_BUFFER, flatten(this.normals), gl.STATIC_DRAW);
-      let normalLoc = gl.getAttribLocation(this.shaders.program.program, 'vNormal');
-      gl.enableVertexAttribArray(normalLoc);
-      gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 0, 0);
-    } */
-
     
     if (this.textCoords){
       this.textCoordBuffer = gl.createBuffer();
@@ -91,11 +81,7 @@ export class Mesh{
       gl.enableVertexAttribArray(textCoordLoc);
     }
 
-    /* let normalLoc = gl.getAttribLocation(this.shaders.program.program, 'vNormal');
-    gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 32, 12);
-    gl.enableVertexAttribArray(normalLoc);
-
-    let textCoordLoc = gl.getAttribLocation(this.shaders.program.program, 'vTextCoord');
+    /* let textCoordLoc = gl.getAttribLocation(this.shaders.program.program, 'vTextCoord');
     gl.vertexAttribPointer(textCoordLoc, 3, gl.FLOAT, false, 32, 12);
     gl.enableVertexAttribArray(textCoordLoc); */
 
@@ -160,7 +146,9 @@ export class Mesh{
     //se qualcosa non va bene distruggere shaders e program
   }
 
-  getModelMatrix(transform){
+  getModelMatrix(object){
+    let transform = object.transform;
+    
     let position = transform.position || [0, 0, 0];
     let rotation = transform.rotation || [0, 0, 0];
     let scale = transform.scale || [1, 1, 1];
@@ -180,6 +168,10 @@ export class Mesh{
     modelMatrix = mult(modelMatrix, rotationMatrixY);
     modelMatrix = mult(modelMatrix, rotationMatrixZ);
     modelMatrix = mult(modelMatrix, scaleMatrix);
+
+    if (object.parent) {
+      modelMatrix = mult(this.getModelMatrix(object.parent), modelMatrix);
+    }
 
     return modelMatrix;
   }
@@ -221,11 +213,11 @@ export class Mesh{
     gl.useProgram(null);
   }
 
-  renderDefault(gl, camera, transform = {}, type, material, lights, defaultShader, locs){
+  renderDefault(gl, camera, object = {}, type, material, lights, defaultShader, locs){
     gl.bindVertexArray(this.VAO);
     gl.useProgram(defaultShader.program.program);
 
-    let modelMatrix = this.getModelMatrix(transform);
+    let modelMatrix = this.getModelMatrix(object);
     let projMatrix = camera.getProjectionMatrix();
     let viewMatrix = camera.getViewMatrix();
 

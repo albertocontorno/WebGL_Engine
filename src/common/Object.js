@@ -45,6 +45,17 @@ export class SceneObject{
     child.parent = this;
   }
 
+  getTransformToRender(){
+    let transformToRender;
+    if (this.parent) {
+      transformToRender = Transform.summed(this.transform, this.parent.getTransformToRender())
+    } else {
+      transformToRender = this.transform;
+    }
+
+    return transformToRender;
+  }
+
   /**
    * 
    * @param {GL_CONTEXT} gl 
@@ -54,17 +65,12 @@ export class SceneObject{
   render(gl, camera, lights, defaultShader, locs){
     //obj passes position, rotation and scaling
     for(let mesh of this.meshes){
-      let transformToRender;
-
-      if(this.parent){
-        transformToRender = Transform.summed(this.transform, this.parent.transform) 
-      } else {
-        transformToRender = this.transform;
-      }
+      let transformToRender = this.getTransformToRender();
+      
       if (mesh.shaders && mesh.shaders.set) {
         mesh.render(gl, camera, transformToRender, this.type, this.material, lights, defaultShader, locs);
       } else {
-        mesh.renderDefault(gl, camera, transformToRender, this.type, this.material, lights, defaultShader, locs)
+        mesh.renderDefault(gl, camera, this, this.type, this.material, lights, defaultShader, locs)
       }
     }
   }

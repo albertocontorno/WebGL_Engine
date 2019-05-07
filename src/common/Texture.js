@@ -58,7 +58,7 @@ export class Texture{
         gl.bindTexture(gl.TEXTURE_2D, null);
         let _loaded = () => {
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            console.log("TEXTURE LOADED", this.textureSource.width);
+            console.log("TEXTURE LOADED", this.id);
             gl.texImage2D(gl.TEXTURE_2D, 0, this.texelType, this.textureSource.width, this.textureSource.height,
                 0, this.s_texelType, gl.UNSIGNED_BYTE, this.textureSource);
             gl.generateMipmap(gl.TEXTURE_2D);

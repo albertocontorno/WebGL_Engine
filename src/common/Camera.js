@@ -62,7 +62,6 @@ export class Camera{
     window.addEventListener("wheel", event => {
       this.zoomLevel += Math.sign(event.deltaY);
       this.zoomLevel = Math.clamp(this.zoomLevel, 0, this.zooms.maxLevel);
-      console.log("zoom ", this.zoomLevel);
       this.setZoomLevel(this.zoomLevel);
     });
     if(type && type === 'perspective'){

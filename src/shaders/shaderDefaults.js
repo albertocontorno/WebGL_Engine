@@ -160,22 +160,6 @@ export const fragmentCompleteShaderObj =  {
 };
 //fragColor * vec4
 //mix(fragColor, texturedColor, 0.4)
-let lightsCalcDef = `// ambient
-  vec3 ambient = light.ambient * material.ambient;
-  
-  // diffuse 
-  vec3 norm = normalize(fNormal);
-  vec3 lightDir = normalize(light.position - fTextCoords);
-  float diff = max(dot(norm, lightDir), 0.0);
-  vec3 diffuse = light.diffuse * (diff * material.diffuse);
-  
-  // specular
-  vec3 viewDir = normalize(viewPos - fTextCoords);
-  vec3 reflectDir = reflect(-lightDir, norm);  
-  float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-  vec3 specular = light.specular * (spec * material.specular);  
-      
-  vec3 result = ambient + diffuse + specular;`
 
 export const DirectionalLightShader = `struct DirectionalLight {
     vec3 direction;

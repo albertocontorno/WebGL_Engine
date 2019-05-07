@@ -233,6 +233,14 @@ function handleInputs() {
       obj3.transform.rotation[1] += 5;
       obj3.transform.rotation[2] += 4;
     }
+
+    if (inputs.isKeyDown(inputs.keyCodes.KEYNAMES.r)) {
+      robotLowerArm.transform.rotation[0] += 4;
+    }
+
+    if (inputs.isKeyDown(inputs.keyCodes.KEYNAMES.t) ) {
+      robotBody.transform.rotation[1] += 4;
+    }
   }
 
   camera.updateCameraDirection(
@@ -245,14 +253,22 @@ function handleInputs() {
 var obj = new SceneObject();
 var obj2 = new SceneObject();
 var obj3 = new SceneObject();
+var robotBody = new SceneObject();
+var robotUpperArm = new SceneObject();
+var robotLowerArm = new SceneObject();
+
 var mat = new Material(vec3(0.0, 0.0,0.1), vec3(0.1, 0.0, 0.7));
 mat.shininess = 256;
 obj.material = mat;
 obj2.material = mat;
 obj3.material = mat;
 
+robotBody.material = mat;
+robotUpperArm.material = mat;
+robotLowerArm.material = mat;
+
 var floor = new SceneObject(null, 'floor');
-floor.material = new Material(vec3(0.1, 0.0,0.0), vec3(0.9, 0.1, 0.2));
+floor.material = new Material(vec3(0.2, 0.0,0.0), vec3(0.9, 0.1, 0.2));
 floor.transform.position = [0, -0.75, 0];
 floor.transform.scale = [5, 0.5, 5];
 let floorMesh = new Mesh(gl, vertices1, null,
@@ -269,6 +285,10 @@ scene.addObject(floor);
 scene.addObject(obj);
 scene.addObject(obj2);
 scene.addObject(obj3);
+scene.addObject(robotBody);
+scene.addObject(robotUpperArm);
+scene.addObject(robotLowerArm);
+
 let cube = new Mesh(gl, vertices1, null,
   { vertex: triangleShaders.vertexShader, fragment: triangleShaders.fragmentShader, set: false }, null, null, null, normals
 );
@@ -288,12 +308,25 @@ obj2.transform.rotation = [0, 50, 0];
 obj3.addMesh(cube3);
 
 obj2.addChild(obj3);
-obj3.transform.position = [-1, 0, -2];
+obj3.transform.position = [-1, 0, -3];
 obj3.transform.scale = [1, 1, 2];
 //obj.addMesh(cube3);
 
+robotBody.addMesh(cube3);
+robotBody.addChild(robotLowerArm);
+robotBody.transform.position = [1, 2, 0];
+robotBody.transform.rotation = [0, 30, 0];
+robotLowerArm.addMesh(cube3);
+robotLowerArm.addChild(robotUpperArm);
+robotLowerArm.transform.position = [0, 1, 0];
+robotLowerArm.transform.scale = [0.5, 1, 0.5];
+robotLowerArm.transform.rotation = [0, 30, 0];
+robotUpperArm.addMesh(cube3);
+robotUpperArm.transform.position = [0, 1, 0];
+robotUpperArm.transform.scale = [0.3, 1, 0.3];
+
 let dirLight = new DirectionalLight();
-dirLight.ambient = vec3(0.0, 0.0, 0.0);
+dirLight.ambient = vec3(0.1, 0.1, 0.1);
 dirLight.diffuse = vec3(1.0, 1.0, 1.0);
 
 let pointLight = new PointLight();
