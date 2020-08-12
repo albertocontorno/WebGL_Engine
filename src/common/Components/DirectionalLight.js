@@ -12,7 +12,7 @@ export class DirectionalLight extends Light{
     constructor(diffuse, ambient, specular, direction){
         super(diffuse, ambient, specular);
         this.name = 'DirectionalLight';
-        this.direction = direction || vec3(1,-1,0);
+        this.direction = direction || vec3(0,-1,0);
     }
 
     static getDirectionForShader(){

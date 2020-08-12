@@ -17,13 +17,15 @@ export class SceneObject{
   parent;
   material;
   name;
+
   onStart = () => {};
 
   onUpdate = () => {};
 
   onDestroy = () => {};
 
-  constructor(startCallback, name){ this.name =name;
+  constructor(startCallback, name){ 
+    this.name =name;
     SceneObject.nextId++;
     this.id = SceneObject.nextId;
     this.onStart = startCallback;
@@ -62,16 +64,12 @@ export class SceneObject{
    * @param {Camera} camera 
    * @param {*} lights 
    */
-  render(gl, camera, lights, defaultShader, locs){
+  render(gl, camera, lights, lightsTypes){
     //obj passes position, rotation and scaling
     for(let mesh of this.meshes){
       let transformToRender = this.getTransformToRender();
-      
-      if (mesh.shaders && mesh.shaders.set) {
-        mesh.render(gl, camera, transformToRender, this.type, this.material, lights, defaultShader, locs);
-      } else {
-        mesh.renderDefault(gl, camera, this, this.type, this.material, lights, defaultShader, locs)
-      }
+      mesh.render(gl, camera, this, this.type, this.material, lights, lightsTypes, this.name);
+      //mesh.renderDefault(gl, camera, this, this.type, this.material, lights, defaultShader, locs)
     }
   }
 

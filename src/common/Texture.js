@@ -1,3 +1,5 @@
+import {TextureTypes} from './Utils/constants'
+
 /**
  * @author Alberto Contorno
  * @class
@@ -17,21 +19,23 @@ export class Texture{
     /**
     *
     * @param {number} textureUnit The texture unit associated to the Texture
-    * @param {GL_ENUM} type The texture type (e.g. TEXTURE_2D)
+    * @param {GL_ENUM} gl_type The texture type (e.g. TEXTURE_2D)
     * @param {vec3} up The up vector of the camera
     * @param {GL_ENUM} s_texelType The texel's type of the source data of the texture.
     * @param {GL_ENUM} texelType The texel's type of the data of the texture stored into the GPU.
     * @param {Array} params Array of params objects {key[GL_ENUM]:value} where the key is a GL_ENUM that specifies the texture parameter and the value is the value to apply.
+    * @param {TextureTypes} type The type of the texture: one of the values of the constant TextureTypes (eg. NormalMap).
     */
-    constructor(textureUnit, type, imagePath, s_texelType, texelType, params){
+    constructor(textureUnit, gl_type, imagePath, s_texelType, texelType, params, type){
         Texture.nextId++;
         this.id = Texture.nextId;
         this.textureUnit = textureUnit || 0;
-        this.type = type;
+        this.gl_type = type;
         this.imagePath = imagePath;
         this.s_texelType = s_texelType;
         this.texelType = texelType;
         this.params = params;
+        this.type = type;
     }
 
     CreateTextureFromArray(gl){
@@ -83,5 +87,8 @@ export class Texture{
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
+    deleteTextyre(gl){
+        gl.deleteTexture(this.texture);
+    }
 
 }

@@ -6,6 +6,15 @@ export const LightTypes = {
     SpotLight: 'SPOTLIGHT'
 }
 
+export const TextureTypes = {
+    DiffuseMap: 'DIFFUSE_MAP',
+    SpecularMap: 'SPECULAR_MAP',
+    NormalMap: 'NORMAL_MAP',
+    LightMap: 'LIGHT_MAP',
+    BumpMap: 'BUMP_MAP',
+    ShadowMap: 'SHADOW_MAP'
+}
+
 export const EmptyTexture = {
     level: 0,
     width:1,

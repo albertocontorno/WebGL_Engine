@@ -10,9 +10,12 @@ import { vec2, vec3 } from "./Utils/Vector_Matrix";
 export class Material{
     static nextId = 1;
     ambient;
-    diffuse;
-    specular;
+    diffuse; // Can be a Texture - If present ambient is to be ignored
+    specular; // Can be a Texture
     shininess;
+
+    textures; // TODO { diffuseMap: Texture, specularMap: Texture, lightMap: Texture, bumpMap: Texture, shadowMap: Texture}
+
     /**
      * Create a new Material to be used by a Mesh.
      * @param {vec3} ambient The ambient color of the object

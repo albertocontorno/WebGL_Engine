@@ -56,7 +56,6 @@ export class Engine{ //TODO SCENE MANAGER
      * Starts the rendering and the update of the time at every frame.
      */
     doRendering() {
-      //scena passa camera
       this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
       this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
       if (this.scenes[this.activeScene] && this.scenes[this.activeScene].mainCamera){

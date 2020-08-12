@@ -25,7 +25,6 @@ export class Light extends Component{
         this.id = Light.nextId;
         Light.nextId++;
         this.name = 'Light';
-        console.log("DIFFUSEE?? ", diffuse)
         this.diffuse = diffuse;
         this.ambient = ambient;
         this.specular = specular;

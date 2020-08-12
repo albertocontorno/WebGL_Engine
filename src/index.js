@@ -4,7 +4,6 @@
 import "./styles.css";
 import { WebGLUtils } from "./common/webgl-utils";
 import { Engine } from "./common/Engine";
-import * as triangleShaders from "./shaders/triangleShader";
 import { InputManager } from "./common/inputManager";
 import { Scene } from "./common/Scene";
 import { Camera } from "./common/Camera";
@@ -241,6 +240,14 @@ function handleInputs() {
     if (inputs.isKeyDown(inputs.keyCodes.KEYNAMES.t) ) {
       robotBody.transform.rotation[1] += 4;
     }
+
+    if(inputs.isKeyDown(inputs.keyCodes.KEYNAMES.o)) {
+      pointLight_obj.transform.position[0] = 4 * Math.sin(engine.time.time);
+      pointLight.position[0] = 4 * Math.sin(engine.time.time);
+
+      pointLight_obj.transform.position[2] = 4 * Math.cos(engine.time.time);
+      pointLight.position[2] = 4 * Math.cos(engine.time.time);
+    } 
   }
 
   camera.updateCameraDirection(
@@ -250,12 +257,13 @@ function handleInputs() {
   );
 }
 
-var obj = new SceneObject();
-var obj2 = new SceneObject();
-var obj3 = new SceneObject();
-var robotBody = new SceneObject();
-var robotUpperArm = new SceneObject();
-var robotLowerArm = new SceneObject();
+var obj = new SceneObject(null, 'obj');
+var obj2 = new SceneObject(null, 'obj2');
+var obj3 = new SceneObject(null, 'obj3');
+var lightsObj = new SceneObject(null, 'lights');
+var robotBody = new SceneObject(null, 'robotBody');
+var robotUpperArm = new SceneObject(null, 'robotUpperArm');
+var robotLowerArm = new SceneObject(null, 'robotLowerArm');
 
 var mat = new Material(vec3(0.0, 0.0,0.1), vec3(0.1, 0.0, 0.7));
 mat.shininess = 256;
@@ -263,7 +271,7 @@ obj.material = mat;
 obj2.material = mat;
 obj3.material = mat;
 
-robotBody.material = mat;
+robotBody.material = new Material(vec3(0.2, 0.0,0.0), vec3(0.9, 0.1, 0.2));
 robotUpperArm.material = mat;
 robotLowerArm.material = mat;
 
@@ -271,15 +279,11 @@ var floor = new SceneObject(null, 'floor');
 floor.material = new Material(vec3(0.2, 0.0,0.0), vec3(0.9, 0.1, 0.2));
 floor.transform.position = [0, -0.75, 0];
 floor.transform.scale = [5, 0.5, 5];
-let floorMesh = new Mesh(gl, vertices1, null,
-  { vertex: triangleShaders.vertexShader, fragment: triangleShaders.fragmentShader, set: false }, null, null,
-  floorTextCoords, normals
-);
-var textureFloor = new Texture(0, null, 'src/shaders/download.jpg', gl.RGB, gl.RGB);
+let floorMesh = new Mesh(gl, vertices1, null, null, null, null,  floorTextCoords, normals);
+var textureFloor = new Texture(0, null, 'assets/download.jpg', gl.RGB, gl.RGB);
 textureFloor.LoadTexture(gl);
-floorMesh.textures.push(textureFloor);
+floorMesh.textures.DIFFUSE_MAP = textureFloor;
 floor.addMesh(floorMesh);
-
 
 scene.addObject(floor);
 scene.addObject(obj);
@@ -288,16 +292,11 @@ scene.addObject(obj3);
 scene.addObject(robotBody);
 scene.addObject(robotUpperArm);
 scene.addObject(robotLowerArm);
+scene.addObject(lightsObj);
 
-let cube = new Mesh(gl, vertices1, null,
-  { vertex: triangleShaders.vertexShader, fragment: triangleShaders.fragmentShader, set: false }, null, null, null, normals
-);
-let cube2 = new Mesh(gl, vertices1, null,
-  { vertex: triangleShaders.vertexShader, fragment: triangleShaders.fragmentShader, set: false }, null, null, null, normals
-);
-let cube3 = new Mesh(gl, vertices1, null,
-  { vertex: triangleShaders.vertexShader, fragment: triangleShaders.fragmentShader, set: false }, null, null, null, normals
-);
+let cube = new Mesh(gl, vertices1, null, null, null, null, null, normals);
+let cube2 = new Mesh(gl, vertices1, null, null, null, null, null, normals);
+let cube3 = new Mesh(gl, vertices1, null, null, null, null, null, normals);
 
 obj.addMesh(cube);
 obj.transform.rotation = [0, 0, 0];
@@ -329,9 +328,27 @@ let dirLight = new DirectionalLight();
 dirLight.ambient = vec3(0.1, 0.1, 0.1);
 dirLight.diffuse = vec3(1.0, 1.0, 1.0);
 
+var pointLight_obj = new SceneObject(null, 'dirLight');
+pointLight_obj.material = new Material(vec3(1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0));
+scene.addObject(pointLight_obj);
+pointLight_obj.addMesh(cube);
+pointLight_obj.transform.position = [0.0, 4.0, -7.0];
+pointLight_obj.transform.scale = [.2, .2, .2];
+
 let pointLight = new PointLight();
 pointLight.position = vec3(0.0, 4.0, -7.0);
-pointLight.diffuse = vec3(0.0, 0.6, 0.0);
+pointLight.diffuse = vec3(1.0, 1.0, 1.0);
+
+var pointLight_obj2 = new SceneObject(null, 'dirLight');
+pointLight_obj2.material = new Material(vec3(1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0));
+scene.addObject(pointLight_obj2);
+pointLight_obj2.addMesh(cube);
+pointLight_obj2.transform.position = [0.0, -3.0, 0.0];
+pointLight_obj2.transform.scale = [.2, .2, .2];
+
+let pointLight2 = new PointLight();
+pointLight2.position = vec3(0.0, -3.0, 0.0);
+pointLight2.diffuse = vec3(1.0, 1.0, 1.0);
 
 let spotLight = new SpotLight();
 spotLight.direction = vec3(0, 1.0, 0.0);
@@ -339,10 +356,11 @@ spotLight.position = vec3(0.0, 2.0, -3.0);
 spotLight.cutOff = 0.011;
 spotLight.outerCutOff = 0.512;
 spotLight.ambient = vec3(1.0, 0.1, 0.1);
-obj3.addComponent(dirLight);
-obj3.addComponent(pointLight);
+lightsObj.addComponent(dirLight);
+lightsObj.addComponent(pointLight);
+lightsObj.addComponent(pointLight2);
 //obj3.addComponent(spotLight);
-var gameManager = new SceneObject();
+var gameManager = new SceneObject(null, 'gm');
 console.log(engine);
 gameManager.onUpdate =  function(){
   handleInputs();

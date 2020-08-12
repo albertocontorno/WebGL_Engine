@@ -28,6 +28,9 @@ export class ShaderUtils {
       return shader;
     }
 
+    /**
+     * @param {[vertex, fragment]} shaders 
+     */
     static createShaderProgramFromShaders(shaders) {
       console.log('[SHADER_PROGRAM] Creating ->', ' Shaders: ', shaders);
       const shaderProgram = this.gl.createProgram();
@@ -73,7 +76,7 @@ export class ShaderUtils {
     }
 
     static setMatrix(name, value){
-      thiss.gl.glUniform4fv(this.gl.getUniformLocation(name), value);
+      this.gl.glUniform4fv(this.gl.getUniformLocation(name), value);
     }
 
 }
