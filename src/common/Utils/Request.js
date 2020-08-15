@@ -42,11 +42,21 @@ export class Request{
             if(this.method == 'GET' || this.method == 'DELETE' || this.method == 'HEAD'){
     
             } else {
-                _options.body = JSON.stringify(data); // TODO DEPENDS ON MYME-TYPE
+                if(_options.headers.contentType === 'application/json') _options.body = JSON.stringify(data); // TODO DEPENDS ON MYME-TYPE
+                else _options.body = data;
             }
             
             fetch(this.url, _options).then( async (res) => {
-                let body = await res.json();
+                let body;
+                let contentType;
+                for (var header of res.headers.entries()){
+                    let [key, value] = header;
+                    if(key === 'content-type'){
+                        contentType = value;
+                    }
+                }
+                if(contentType.includes('application/json')) { body = await res.json(); }
+                else { body = res.text(); };
                 resolve(body);
             }).catch( err => reject(err));
 

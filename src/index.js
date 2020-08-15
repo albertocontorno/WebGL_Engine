@@ -15,6 +15,10 @@ import { PointLight } from './common/Components/PointLight';
 import { SpotLight } from './common/Components/SpotLight';
 import { vec2, vec3, vec4, perspective, lookAt, scale, add, subtract,  } from "./common/Utils/Vector_Matrix";
 import { Material } from "./common/Material";
+import { Request } from './common/Utils/Request';
+import { ObjLoader } from './common/Loaders/ObjLoader';
+import { Time } from "./common/Time";
+
 var inputs = new InputManager();
 
 const up = vec3(0.0, 1.0, 0.0);
@@ -32,10 +36,61 @@ var camera = new Camera(vec3(0, 0, 0), up, 5, "perspective", {},
   25, { maxLevel: 3, 0: 30, 1: 45, 2: 75, 3: 90 }, 1
 ); */
 gl.enable(gl.DEPTH_TEST);
+//gl.enable(gl.CULL_FACE);
 gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 gl.clearColor(0.0, 0.0, 0.0, 1.0);
 var engine = new Engine(gl, {showFps: true});
 var scene = new Scene();
+
+const req = new Request('http://localhost:1234/assets/windmill.obj');
+const reqMtl = new Request('http://localhost:1234/assets/windmill.mtl');
+
+Promise.all([req.send(), reqMtl.send()]).then( res => {
+  const obj = res[0];
+  const mat = res[1];
+  
+  const loader = new ObjLoader();
+  let m = loader.parse(obj);
+  console.log(m);
+  let o = new SceneObject(null, 'test load');
+  const mtl = loader.parseMTL(mat);
+  console.log(mtl);
+  m.geometries.forEach( g => {
+    let oo = new SceneObject(null, 'test load');
+    
+    let verts = [];
+    let verts_n = [];
+    let colors;
+    let data = g.data;
+    for(let i = 0; i<data.position.length-2; i+=3){
+      verts.push(vec4(data.position[i], data.position[i+1], data.position[i+2], 1.0));
+      verts_n.push(vec3(data.normal[i], data.normal[i+1], data.normal[i+2]));
+    }
+    if(data.color){
+      colors = [];
+      for(let i = 0; i<data.color.length-2; i+=3){
+        colors.push(vec4(data.color[i], data.color[i+1], data.color[i+2], 1.0));
+      }
+    }
+
+    oo.addMesh(new Mesh(gl, verts, null, null, null, null, null, verts_n, colors));
+    oo.parent = o;
+    scene.addObject(oo);
+    let ooMat = mtl[g.material]
+
+    oo.material = new Material(ooMat.ambient, ooMat.diffuse, ooMat.specular, ooMat.shininess);
+  });
+
+
+  o.transform.position = [-2,3,0];
+  //o.transform.scale = [.5,.5,.5]
+  scene.addObject(o);
+  //initMeshBuffers(gl, m);
+
+
+})
+
+
 
 let vertices = [
   vec4(-0.5, -0.5, 0.5, 1.0), //l b 0 0
@@ -137,6 +192,50 @@ var normals = [
   vec3(0.0, 1.0, 0.0)
 ]
 
+var normals1 = [
+  vec3(0.0, 0.0, 1.0),
+  vec3(0.0, 0.0, 1.0),
+  vec3(0.0, 0.0, 1.0),
+  vec3(0.0, 0.0, 1.0),
+  vec3(0.0, 0.0, 1.0),
+  vec3(0.0, 0.0, 1.0),
+
+  vec3(0.0, 0.0, -1.0),
+  vec3(0.0, 0.0, -1.0),
+  vec3(0.0, 0.0, -1.0),
+  vec3(0.0, 0.0, -1.0),
+  vec3(0.0, 0.0, -1.0),
+  vec3(0.0, 0.0, -1.0),
+
+  vec3(-1.0, 0.0, 0.0),
+  vec3(-1.0, 0.0, 0.0),
+  vec3(-1.0, 0.0, 0.0),
+  vec3(-1.0, 0.0, 0.0),
+  vec3(-1.0, 0.0, 0.0),
+  vec3(-1.0, 0.0, 0.0),
+
+  vec3(1.0, 0.0, 0.0),
+  vec3(1.0, 0.0, 0.0),
+  vec3(1.0, 0.0, 0.0),
+  vec3(1.0, 0.0, 0.0),
+  vec3(1.0, 0.0, 0.0),
+  vec3(1.0, 0.0, 0.0),
+
+  vec3(0.0, 1.0, 0.0),
+  vec3(0.0, 1.0, 0.0),
+  vec3(0.0, 1.0, 0.0),
+  vec3(0.0, 1.0, 0.0),
+  vec3(0.0, 1.0, 0.0),
+  vec3(0.0, 1.0, 0.0),
+
+  vec3(0.0, -1.0, 0.0),
+  vec3(0.0, -1.0, 0.0),
+  vec3(0.0, -1.0, 0.0),
+  vec3(0.0, -1.0, 0.0),
+  vec3(0.0, -1.0, 0.0),
+  vec3(0.0, -1.0, 0.0)
+]
+
 var floorTextCoords = [
   vec2(0, 0),
   vec2(1, 0),
@@ -183,8 +282,8 @@ var floorTextCoords = [
 
 let indices = [
   //front
-  0,  1,  2,
-  2,  1,  3,  
+  0,  2,  1,
+  2,  3,  1,  
   //back
   4,  5,  6,
   6,  5,  7,
@@ -192,11 +291,11 @@ let indices = [
   0,  1,  4,
   4,  1,  5,
     //right
-  2,  3,  6,  
-  6,  3,  7,
+  2,  6,  3,  
+  6,  7,  3,
   //top
-  3,  1,  7,
-  7,  1,  5,
+  3,  7,  1,
+  7,  5,  1,
   //bottom
   2,  0,  6,
   6,  0,  4
@@ -365,8 +464,7 @@ console.log(engine);
 gameManager.onUpdate =  function(){
   handleInputs();
   inputs.clearMousePosition();
-  obj.transform.rotation[1] += 0.1;
-  obj3.transform.rotation[1] += 0.1;
+  //obj.transform.rotation[1] += 0.1;
 }
 scene.addObject(gameManager);
 scene.addCamera(camera);

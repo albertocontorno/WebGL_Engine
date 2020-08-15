@@ -14,7 +14,7 @@ export class ShaderFactory{
     /**
      * 
      * @param {{
-        *  material : { diffuse, specular, specular, shininess, 
+        *  material : { diffuse, specular, specular, shininess, vertexColoring(true, false),
         *      textures: { diffuseMap, specularMap, lightMap, bumpMap, shadowMap}
         *  },
         *  lights : {lights, lightsValues: []},
@@ -23,6 +23,12 @@ export class ShaderFactory{
     static CreateVertexShaderFromProperties(props) {
         let vertexSource = shaderDefault.vertexCompleteShaderObj();
         if(props.material){
+            if(props.material.vertexColoring){
+                vertexSource.colorIn = shaderDefault.vColor_In;
+                vertexSource.colorOut = shaderDefault.vColor_Out;
+                vertexSource.colorAssign = shaderDefault.vColor_Assign;
+            }
+
             const textures = props.material.textures
             if(textures){
                 if(textures[TextureTypes.DiffuseMap]){
@@ -60,7 +66,7 @@ export class ShaderFactory{
     /**
      * 
      * @param {{
-        *  material : { diffuse, specular, specular, shininess, 
+        *  material : { diffuse, specular, specular, shininess, vertexColoring(true, false),
         *      textures: { diffuseMap, specularMap, lightMap, bumpMap, shadowMap}
         *  },
         *  lights : {lights, lightsValues: []},
@@ -68,11 +74,14 @@ export class ShaderFactory{
      */
     static CreateFragmentShaderFromProperties(props, n) {
         let fragmentSource = shaderDefault.fragmentShaderCompleteObj();
-        console.log(JSON.parse(JSON.stringify(fragmentSource)))
         let hasLights = false;
         let hasTexture ={  hasDiffuseTexture: false };
 
         if(props.material){
+            if(props.material.vertexColoring){
+                fragmentSource.colorIn = shaderDefault.fColorIn;
+            }
+
             fragmentSource.materialStruct = shaderDefault.materialStruct;
             fragmentSource.material = shaderDefault.materialVar;
             const textures = props.material.textures
@@ -111,6 +120,9 @@ export class ShaderFactory{
             fragmentSource.lightsCalc = this.doLightCalcs(props.lights.lights, props.material.textures);
             fragmentSource.lightsFuncImpl = this.getLightsFuncImpl(props.lights.lightsTypes, props.material.textures);
             fragmentSource.fragOutput = shaderDefault.fOutput_Lights;
+            if(props.material.vertexColoring){
+                fragmentSource.fragOutput = shaderDefault.fOutput_Lights_Color
+            }
         }
 
         fragmentSource = Object.values(fragmentSource).join('');

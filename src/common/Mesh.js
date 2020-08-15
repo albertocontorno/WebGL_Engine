@@ -38,11 +38,12 @@ export class Mesh{
    * @param {*} textures // props.material.textures = {  DIFFUSE_MAP: 1, SPECULAR_MAP: 1, NORMAL_MAP: 1, LIGHT_MAP: 1, BUMP_MAP: 1, SHADOW_MAP: 1 };
    * @param {*} textCoords 
    */
-  constructor(gl, vertices, indices, shaders, opt, textures, textCoords, normals){
+  constructor(gl, vertices, indices, shaders, opt, textures, textCoords, normals, colors){
     Mesh.nextId++;
     this.gl = gl;
     this.id = Mesh.nextId;
     this.vertices = vertices;
+    this.colors = colors;
     this.indices = indices;
     this.opt = opt || { keepData: true };
     this.type = this.opt.type || gl.TRIANGLES;
@@ -93,6 +94,15 @@ export class Mesh{
       this.EBO = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.EBO);
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW);
+    }
+
+    if(this.colors){
+      this.CBO = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.CBO);
+      gl.bufferData(gl.ARRAY_BUFFER, flatten(this.colors), gl.STATIC_DRAW);
+      let colorsLoc = gl.getAttribLocation(this.shaders.program.program, 'vColor');
+      gl.vertexAttribPointer(colorsLoc, 4, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(colorsLoc);
     }
     
     /* let textCoordLoc = gl.getAttribLocation(this.shaders.program.program, 'vTextCoord');
@@ -220,7 +230,8 @@ export class Mesh{
       const props = { id: name,
         material: {
           ...material,
-          textures:  this.textures
+          textures:  this.textures,
+          vertexColoring: !!this.colors
         },
         lights: {
           lights: lights,

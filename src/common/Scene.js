@@ -118,7 +118,7 @@ export class Scene{
 
   renderScene(gl){
     for (let obj of this.objects) {
-      obj.onUpdate();
+      obj.onUpdate(obj);
       obj.render(gl, this.mainCamera, this.lights, this.lightsTypes);
     }
   }

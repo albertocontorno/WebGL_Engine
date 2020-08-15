@@ -1,3 +1,7 @@
+export const vColor_In = 'in vec4 vColor;\n';
+export const vColor_Out = 'out vec4 fColor;\n';
+export const vColor_Assign = 'fColor = vColor;\n';
+
 export const vDiffuseCoords_In = 'in vec2 vDiffuseTextCoords;\n';
 export const vSpecularCoords_In = 'in vec2 vSpecularTextCoords;\n';
 export const vLightCoords_In = 'in vec2 vLightTextCoords;\n';
@@ -22,6 +26,7 @@ export const vNormalCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\
 export const vertexCompleteShaderObj = () =>({
   version: "#version 300 es\n",
   position: "in vec4 vPosition;\n",
+  colorIn: '',
   diffuseCoordsIn: '',
   diffuseCoordsOut: '',
   specularCoordsIn: '',
@@ -30,16 +35,16 @@ export const vertexCompleteShaderObj = () =>({
   normalCoordsOut: '',
   normalIn: "in vec3 vNormal;\n",
   modelViewProj: "uniform mat4 model;\nuniform mat4 view;\nuniform mat4 projection;\n",
-  colorOut: "out vec4 fColor;\n",
+  colorOut: '',
   normalOut: "out vec3 fNormal;\n",
   fragPosOut: "out vec3 fPos;\n",
   mainStart: "void main(){\n",
-  mainBody: "\tfColor = vPosition;\n"+
-  "\tfNormal = mat3(transpose(inverse(model))) * vNormal;\n"+
+  mainBody: "\tfNormal = mat3(transpose(inverse(model))) * vNormal;\n"+
   "\tfPos = vec3(model * vPosition);\n",
   diffuseAssign: '',
   specularAssign: '',
   normalAssign: '',
+  colorAssign: '',
   mainBodyOutput: '\tgl_Position = projection * view * model * vPosition;\n}'
 });
 
@@ -229,14 +234,8 @@ vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
     vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
     vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords)); */
 
-export const textureScheme = `
-mainTexture;
-bumpMap;
-lightMap;
-shadowMap;
-`
-
 export const materialVar = 'uniform Material material;\n';
+export const fColorIn = 'in vec4 fColor;\n';
 
 export const diffuseMapVar = 'uniform sampler2D diffuseTexture;\n';
 export const specularMapVar = 'uniform sampler2D specularTexture;\n';
@@ -253,6 +252,7 @@ export const fShadowCoords = 'in vec2 fShadowTextCoords;\n';
 export const fNormalCoords = 'in vec2 fNormalTextCoords;\n';
 
 export const fOutput_Lights = '\tfragColor = vec4(lightColor, 1.0);\n'
+export const fOutput_Lights_Color = '\tfragColor = vec4(lightColor, 1.0) * fColor;\n'
 
 export var fragmentShaderCompleteObj = ()=>({
   version: '#version 300 es\n',
@@ -260,7 +260,7 @@ export var fragmentShaderCompleteObj = ()=>({
   materialStruct: '',
   lightsStructs: '',
   lightsFuncDec: '',
-  colorIn: 'in vec4 fColor;\n',
+  colorIn: '',
   normalIn: 'in vec3 fNormal;\n',
   fragPosIn: 'in vec3 fPos;\n',
   texturesCoords: '',
