@@ -5929,8 +5929,8 @@ var engine = new _Engine.Engine(gl, {
   showFps: true
 });
 var scene = new _Scene.Scene();
-var req = new _Request.Request('http://localhost:1234/assets/windmill.obj');
-var reqMtl = new _Request.Request('http://localhost:1234/assets/windmill.mtl');
+var req = new _Request.Request('https://albertocontorno.github.io/WebGL_Engine/assets/windmill.obj');
+var reqMtl = new _Request.Request('https://albertocontorno.github.io/WebGL_Engine/assets/windmill.mtl');
 Promise.all([req.send(), reqMtl.send()]).then(function (res) {
   var obj = res[0];
   var mat = res[1];

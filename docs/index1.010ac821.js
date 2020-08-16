@@ -1061,7 +1061,7 @@ exports.Request = Request;
 
 var _Request = require("./common/utils/Request");
 
-var req = new _Request.Request('http://localhost:1234/assets/test.json');
+var req = new _Request.Request('https://albertocontorno.github.io/WebGL_Engine/assets/test.json');
 req.send().then(function (res) {
   return console.log(res);
 });
