@@ -172,13 +172,13 @@ export class ObjLoader extends ModelLoader{
   parseMTL(text) {
     const materials = {};
     let material;
-  
+    
     const keywords = {
       newmtl(parts, unparsedArgs) {
         material = {};
         materials[unparsedArgs] = material;
       },
-      /* eslint brace-style:0 */
+
       Ns: (parts) => { material.shininess      = parseFloat(parts[0]); },
       Ka: (parts) => { material.ambient        = parts.map(parseFloat); },
       Kd: (parts) => { material.diffuse        = parts.map(parseFloat); },

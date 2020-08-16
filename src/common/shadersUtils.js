@@ -21,7 +21,7 @@ export class ShaderUtils {
     }
 
     static loadAndCompileShader(type, source) {
-      console.log('[SHADER] Compiling ->', ' Type: ', type, '- Source: '/* , source */)
+      console.log('[SHADER] Compiling ->', ' Type: ', type, '- Source: ', source)
       let shader = this.gl.createShader(type);
       this.gl.shaderSource(shader, source);
       this.gl.compileShader(shader);

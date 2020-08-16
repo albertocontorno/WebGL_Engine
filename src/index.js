@@ -17,7 +17,7 @@ import { vec2, vec3, vec4, perspective, lookAt, scale, add, subtract,  } from ".
 import { Material } from "./common/Material";
 import { Request } from './common/Utils/Request';
 import { ObjLoader } from './common/Loaders/ObjLoader';
-import { Time } from "./common/Time";
+import { generateTangents } from './common/Utils/NormalsGenerator';
 
 var inputs = new InputManager();
 
@@ -55,16 +55,22 @@ Promise.all([req.send(), reqMtl.send()]).then( res => {
   let o = new SceneObject(null, 'test load');
   const mtl = loader.parseMTL(mat);
   console.log(mtl);
+
   m.geometries.forEach( g => {
     let oo = new SceneObject(null, 'test load');
     
     let verts = [];
     let verts_n = [];
+    let text_coords = [];
     let colors;
     let data = g.data;
+    let tangents;
     for(let i = 0; i<data.position.length-2; i+=3){
       verts.push(vec4(data.position[i], data.position[i+1], data.position[i+2], 1.0));
       verts_n.push(vec3(data.normal[i], data.normal[i+1], data.normal[i+2]));
+    }
+    for(let i = 0; i<data.texcoord.length-1; i+=2){
+      text_coords.push(vec2(data.texcoord[i], data.texcoord[i+1], 1.0));
     }
     if(data.color){
       colors = [];
@@ -73,11 +79,26 @@ Promise.all([req.send(), reqMtl.send()]).then( res => {
       }
     }
 
-    oo.addMesh(new Mesh(gl, verts, null, null, null, null, null, verts_n, colors));
+    if (data.texcoord && data.normal) {
+      tangents = generateTangents(verts, text_coords); 
+    }
+    
+    let ooMesh = new Mesh(gl, verts, null, null, null, null, text_coords, verts_n, colors);
+    oo.addMesh(ooMesh);
     oo.parent = o;
     scene.addObject(oo);
     let ooMat = mtl[g.material]
+    if(ooMat['diffuseMap']){
+      let diffuseMap = new Texture(0, null, 'assets/'+ooMat['diffuseMap'], gl.RGB, gl.RGB, {flipY: true});
+      diffuseMap.LoadTexture(gl);
+      ooMesh.textures.DIFFUSE_MAP = diffuseMap;
+    }
 
+    if(ooMat['specularMap']){
+      let specularMap = new Texture(1, null, 'assets/'+ooMat['specularMap'], gl.RGB, gl.RGB, {flipY: true});
+      specularMap.LoadTexture(gl);
+      ooMesh.textures.SPECULAR_MAP = specularMap;
+    }
     oo.material = new Material(ooMat.ambient, ooMat.diffuse, ooMat.specular, ooMat.shininess);
   });
 
@@ -342,10 +363,8 @@ function handleInputs() {
 
     if(inputs.isKeyDown(inputs.keyCodes.KEYNAMES.o)) {
       pointLight_obj.transform.position[0] = 4 * Math.sin(engine.time.time);
-      pointLight.position[0] = 4 * Math.sin(engine.time.time);
-
       pointLight_obj.transform.position[2] = 4 * Math.cos(engine.time.time);
-      pointLight.position[2] = 4 * Math.cos(engine.time.time);
+      pointLight.position = pointLight_obj.transform.position;
     } 
   }
 
@@ -426,16 +445,17 @@ robotUpperArm.transform.scale = [0.3, 1, 0.3];
 let dirLight = new DirectionalLight();
 dirLight.ambient = vec3(0.1, 0.1, 0.1);
 dirLight.diffuse = vec3(1.0, 1.0, 1.0);
+dirLight.direction = vec3(0.3, -1.0, 0.1);
 
 var pointLight_obj = new SceneObject(null, 'dirLight');
 pointLight_obj.material = new Material(vec3(1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0));
 scene.addObject(pointLight_obj);
 pointLight_obj.addMesh(cube);
-pointLight_obj.transform.position = [0.0, 4.0, -7.0];
+pointLight_obj.transform.position = [0.0, 6, -7.0];
 pointLight_obj.transform.scale = [.2, .2, .2];
 
 let pointLight = new PointLight();
-pointLight.position = vec3(0.0, 4.0, -7.0);
+pointLight.position = vec3(0.0, 4, -7.0);
 pointLight.diffuse = vec3(1.0, 1.0, 1.0);
 
 var pointLight_obj2 = new SceneObject(null, 'dirLight');

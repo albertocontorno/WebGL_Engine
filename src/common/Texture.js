@@ -45,7 +45,7 @@ export class Texture{
             0, this.s_texelType, gl.UNSIGNED_BYTE, new Uint8Array([255, 255, 255, 255]));
         gl.bindTexture(gl.TEXTURE_2D, null);
     }
-
+    
     LoadTexture(gl){
         this.textureSource = new Image();
         this.textureSource.crossOrigin = "";
@@ -79,6 +79,9 @@ export class Texture{
     }
 
     ActiveTexture(gl){
+        if(this.params){
+            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this.params.flipY);
+        }
         gl.activeTexture(gl.TEXTURE0 + this.textureUnit);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
     }

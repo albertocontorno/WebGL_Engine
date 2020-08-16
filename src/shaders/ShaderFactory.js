@@ -31,31 +31,9 @@ export class ShaderFactory{
 
             const textures = props.material.textures
             if(textures){
-                if(textures[TextureTypes.DiffuseMap]){
-                    vertexSource.diffuseCoordsIn = shaderDefault.vDiffuseCoords_In;
-                    vertexSource.diffuseCoordsOut = shaderDefault.vDiffuseCoords_Out;
-                    vertexSource.diffuseAssign = shaderDefault.vDiffuseCoords_Assign;
-                } 
-                if(textures[TextureTypes.SpecularMap]){
-                    vertexSource.specularCoordsIn = shaderDefault.vSpecularCoords_In;
-                    vertexSource.specularCoordsOut = shaderDefault.vSpecularCoords_Out;
-                    vertexSource.specularAssign = shaderDefault.vSpecularCoords_Assign;
-                } 
-                /* if(textures[TextureTypes.LightMap]){
-                    vertexSource.specularCoordsIn = shaderDefault.vSpecularCoords_In;
-                    vertexSource.specularCoordsOut = shaderDefault.vSpecularCoords_Out;
-                    vertexSource.specularAssign = shaderDefault.vSpecularCoords_Assign;
-                } 
-                if(textures[TextureTypes.BumpMap]){
-                    vertexSource.specularCoordsIn = shaderDefault.vSpecularCoords_In;
-                    vertexSource.specularCoordsOut = shaderDefault.vSpecularCoords_Out;
-                    vertexSource.specularAssign = shaderDefault.vSpecularCoords_Assign;
-                } 
-                if(textures[TextureTypes.ShadowMap]){
-                    vertexSource.specularCoordsIn = shaderDefault.vSpecularCoords_In;
-                    vertexSource.specularCoordsOut = shaderDefault.vSpecularCoords_Out;
-                    vertexSource.specularAssign = shaderDefault.vSpecularCoords_Assign;
-                } */
+                vertexSource.textureCoordsIn = shaderDefault.vTextureCoords_In;
+                vertexSource.textureCoordsOut = shaderDefault.vTextureCoords_Out;
+                vertexSource.textureCoordsAssign = shaderDefault.vTextureCoords_Assign;
             }
         }
 
@@ -86,27 +64,28 @@ export class ShaderFactory{
             fragmentSource.material = shaderDefault.materialVar;
             const textures = props.material.textures
             if(textures){
+                fragmentSource.texturesCoords = shaderDefault.fTextureCoords;
                 if(textures[TextureTypes.DiffuseMap]){
                     
                     fragmentSource.samplers += shaderDefault.diffuseMapVar;
-                    fragmentSource.texturesCoords += shaderDefault.fDiffuseCoords;
+                    //fragmentSource.texturesCoords += shaderDefault.fDiffuseCoords;
                     hasTexture.hasDiffuseTexture = true;
                 } 
                 if(textures[TextureTypes.SpecularMap]){
                     fragmentSource.samplers += shaderDefault.specularMapVar;
-                    fragmentSource.texturesCoords += shaderDefault.fSpecularCoords;
+                    //fragmentSource.texturesCoords += shaderDefault.fSpecularCoords;
                 } 
                 if(textures[TextureTypes.LightMap]){
                     fragmentSource.samplers += shaderDefault.lightMapVar;
-                    fragmentSource.texturesCoords += shaderDefault.fLightCoords;
+                    //fragmentSource.texturesCoords += shaderDefault.fLightCoords;
                 } 
                 if(textures[TextureTypes.BumpMap]){
                     fragmentSource.samplers += shaderDefault.bumbMapVar;
-                    fragmentSource.texturesCoords += shaderDefault.fBumpCoords;
+                    //fragmentSource.texturesCoords += shaderDefault.fBumpCoords;
                 } 
                 if(textures[TextureTypes.ShadowMap]){
                     fragmentSource.samplers += shaderDefault.shadowMapVar;
-                    fragmentSource.texturesCoords += shaderDefault.fShadowCoords;
+                    //fragmentSource.texturesCoords += shaderDefault.fShadowCoords;
                 }
                 fragmentSource.textureCalc = this.getTexturesCalc(props.material.textures);
             }

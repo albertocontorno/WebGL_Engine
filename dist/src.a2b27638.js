@@ -447,9 +447,7 @@ var ShaderUtils = /*#__PURE__*/function () {
   }, {
     key: "loadAndCompileShader",
     value: function loadAndCompileShader(type, source) {
-      console.log('[SHADER] Compiling ->', ' Type: ', type, '- Source: '
-      /* , source */
-      );
+      console.log('[SHADER] Compiling ->', ' Type: ', type, '- Source: ', source);
       var shader = this.gl.createShader(type);
       this.gl.shaderSource(shader, source);
       this.gl.compileShader(shader);
@@ -3043,56 +3041,28 @@ exports.DefTextCoords = DefTextCoords;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.fragmentShaderCompleteObj = exports.fOutput_Lights_Color = exports.fOutput_Lights = exports.fNormalCoords = exports.fShadowCoords = exports.fBumpCoords = exports.fLightCoords = exports.fSpecularCoords = exports.fDiffuseCoords = exports.normalMapVar = exports.shadowMapVar = exports.bumbMapVar = exports.lightMapVar = exports.specularMapVar = exports.diffuseMapVar = exports.fColorIn = exports.materialVar = exports.SpotLightFuncImplObj = exports.PointLightFuncImplObj = exports.DirLightFuncImplObj = exports.LightSpecularWithTexture_Spec = exports.LightDiffuseWithTexture_Spec = exports.LightAmbientWithTexture_Spec = exports.LightSpecularWithTexture_Diff = exports.LightDiffuseWithTexture_Diff = exports.LightAmbientWithTexture_Diff = exports.LightSpecularWithTexture_Diff_Spec = exports.LightDiffuseWithTexture_Diff_Spec = exports.LightAmbientWithTexture_Diff_Spec = exports.SpotLightFuncDec = exports.PointLightFuncDec = exports.DirLightFuncDec = exports.SpotLightShader = exports.PointLightShader = exports.DirectionalLightShader = exports.materialStruct = exports.vertexCompleteShaderObj = exports.vNormalCoords_Assign = exports.vShadowCoords_Assign = exports.vBumpCoords_Assign = exports.vLightCoords_Assign = exports.vSpecularCoords_Assign = exports.vDiffuseCoords_Assign = exports.vNormalCoords_Out = exports.vShadowCoords_Out = exports.vBumpCoords_Out = exports.vLightCoords_Out = exports.vSpecularCoords_Out = exports.vDiffuseCoords_Out = exports.vNormalCoords_In = exports.vShadowCoords_In = exports.vBumpCoords_In = exports.vLightCoords_In = exports.vSpecularCoords_In = exports.vDiffuseCoords_In = exports.vColor_Assign = exports.vColor_Out = exports.vColor_In = void 0;
+exports.fragmentShaderCompleteObj = exports.fOutput_Lights_Color = exports.fOutput_Lights = exports.fDiffuseCoords = exports.fTextureCoords = exports.normalMapVar = exports.shadowMapVar = exports.bumbMapVar = exports.lightMapVar = exports.specularMapVar = exports.diffuseMapVar = exports.fColorIn = exports.materialVar = exports.SpotLightFuncImplObj = exports.PointLightFuncImplObj = exports.DirLightFuncImplObj = exports.LightSpecularWithTexture_Spec = exports.LightDiffuseWithTexture_Spec = exports.LightAmbientWithTexture_Spec = exports.LightSpecularWithTexture_Diff = exports.LightDiffuseWithTexture_Diff = exports.LightAmbientWithTexture_Diff = exports.LightSpecularWithTexture_Diff_Spec = exports.LightDiffuseWithTexture_Diff_Spec = exports.LightAmbientWithTexture_Diff_Spec = exports.SpotLightFuncDec = exports.PointLightFuncDec = exports.DirLightFuncDec = exports.SpotLightShader = exports.PointLightShader = exports.DirectionalLightShader = exports.materialStruct = exports.vertexCompleteShaderObj = exports.vTextureCoords_Assign = exports.vTextureCoords_Out = exports.vTextureCoords_In = exports.vColor_Assign = exports.vColor_Out = exports.vColor_In = void 0;
 var vColor_In = 'in vec4 vColor;\n';
 exports.vColor_In = vColor_In;
 var vColor_Out = 'out vec4 fColor;\n';
 exports.vColor_Out = vColor_Out;
 var vColor_Assign = 'fColor = vColor;\n';
 exports.vColor_Assign = vColor_Assign;
-var vDiffuseCoords_In = 'in vec2 vDiffuseTextCoords;\n';
-exports.vDiffuseCoords_In = vDiffuseCoords_In;
-var vSpecularCoords_In = 'in vec2 vSpecularTextCoords;\n';
-exports.vSpecularCoords_In = vSpecularCoords_In;
-var vLightCoords_In = 'in vec2 vLightTextCoords;\n';
-exports.vLightCoords_In = vLightCoords_In;
-var vBumpCoords_In = 'in vec2 vBumpTextCoords;\n';
-exports.vBumpCoords_In = vBumpCoords_In;
-var vShadowCoords_In = 'in vec2 vShadowTextCoords;\n';
-exports.vShadowCoords_In = vShadowCoords_In;
-var vNormalCoords_In = 'in vec2 vNormalTextCoords;\n';
-exports.vNormalCoords_In = vNormalCoords_In;
-var vDiffuseCoords_Out = 'out vec2 fDiffuseTextCoords;\n';
-exports.vDiffuseCoords_Out = vDiffuseCoords_Out;
-var vSpecularCoords_Out = 'out vec2 fSpecularTextCoords;\n';
-exports.vSpecularCoords_Out = vSpecularCoords_Out;
-var vLightCoords_Out = 'out vec2 fLightTextCoords;\n';
-exports.vLightCoords_Out = vLightCoords_Out;
-var vBumpCoords_Out = 'out vec2 fBumpTextCoords;\n';
-exports.vBumpCoords_Out = vBumpCoords_Out;
-var vShadowCoords_Out = 'out vec2 fShadowTextCoords;\n';
-exports.vShadowCoords_Out = vShadowCoords_Out;
-var vNormalCoords_Out = 'out vec2 fNormalTextCoords;\n';
-exports.vNormalCoords_Out = vNormalCoords_Out;
-var vDiffuseCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\n';
-exports.vDiffuseCoords_Assign = vDiffuseCoords_Assign;
-var vSpecularCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\n';
-exports.vSpecularCoords_Assign = vSpecularCoords_Assign;
-var vLightCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\n';
-exports.vLightCoords_Assign = vLightCoords_Assign;
-var vBumpCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\n';
-exports.vBumpCoords_Assign = vBumpCoords_Assign;
-var vShadowCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\n';
-exports.vShadowCoords_Assign = vShadowCoords_Assign;
-var vNormalCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\n';
-exports.vNormalCoords_Assign = vNormalCoords_Assign;
+var vTextureCoords_In = 'in vec2 vTextureCoords;\n';
+exports.vTextureCoords_In = vTextureCoords_In;
+var vTextureCoords_Out = 'out vec2 fTextureCoords;\n';
+exports.vTextureCoords_Out = vTextureCoords_Out;
+var vTextureCoords_Assign = '\tfTextureCoords = vTextureCoords;\n';
+exports.vTextureCoords_Assign = vTextureCoords_Assign;
 
 var vertexCompleteShaderObj = function vertexCompleteShaderObj() {
   return {
     version: "#version 300 es\n",
     position: "in vec4 vPosition;\n",
     colorIn: '',
+    textureCoordsIn: '',
     diffuseCoordsIn: '',
+    textureCoordsOut: '',
     diffuseCoordsOut: '',
     specularCoordsIn: '',
     specularCoordsOut: '',
@@ -3105,6 +3075,7 @@ var vertexCompleteShaderObj = function vertexCompleteShaderObj() {
     fragPosOut: "out vec3 fPos;\n",
     mainStart: "void main(){\n",
     mainBody: "\tfNormal = mat3(transpose(inverse(model))) * vNormal;\n" + "\tfPos = vec3(model * vPosition);\n",
+    textureCoordsAssign: '',
     diffuseAssign: '',
     specularAssign: '',
     normalAssign: '',
@@ -3128,15 +3099,15 @@ var PointLightFuncDec = 'vec3 CalcPointLight(PointLight light, vec3 normal, vec3
 exports.PointLightFuncDec = PointLightFuncDec;
 var SpotLightFuncDec = 'vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);\n';
 exports.SpotLightFuncDec = SpotLightFuncDec;
-var LightAmbientWithTexture_Diff_Spec = '\tvec3 ambient = light.ambient * vec3(texture(diffuseTexture, fDiffuseTextCoords));\n';
+var LightAmbientWithTexture_Diff_Spec = '\tvec3 ambient = light.ambient * vec3(texture(diffuseTexture, fTextureCoords));\n';
 exports.LightAmbientWithTexture_Diff_Spec = LightAmbientWithTexture_Diff_Spec;
-var LightDiffuseWithTexture_Diff_Spec = '\tvec3 diffuse = light.diffuse * diff * vec3(texture(diffuseTexture, fDiffuseTextCoords));\n';
+var LightDiffuseWithTexture_Diff_Spec = '\tvec3 diffuse = light.diffuse * diff * vec3(texture(diffuseTexture, fTextureCoords));\n';
 exports.LightDiffuseWithTexture_Diff_Spec = LightDiffuseWithTexture_Diff_Spec;
-var LightSpecularWithTexture_Diff_Spec = '\tvec3 specular = light.specular * spec * vec3(texture(specularTexture, fSpecularTextCoords));\n';
+var LightSpecularWithTexture_Diff_Spec = '\tvec3 specular = light.specular * spec * vec3(texture(specularTexture, fTextureCoords));\n';
 exports.LightSpecularWithTexture_Diff_Spec = LightSpecularWithTexture_Diff_Spec;
-var LightAmbientWithTexture_Diff = '\tvec3 ambient = light.ambient * vec3(texture(diffuseTexture, fDiffuseTextCoords));\n';
+var LightAmbientWithTexture_Diff = '\tvec3 ambient = light.ambient * vec3(texture(diffuseTexture, fTextureCoords));\n';
 exports.LightAmbientWithTexture_Diff = LightAmbientWithTexture_Diff;
-var LightDiffuseWithTexture_Diff = '\tvec3 diffuse = light.diffuse * diff * vec3(texture(diffuseTexture, fDiffuseTextCoords));\n';
+var LightDiffuseWithTexture_Diff = '\tvec3 diffuse = light.diffuse * diff * vec3(texture(diffuseTexture, fTextureCoords));\n';
 exports.LightDiffuseWithTexture_Diff = LightDiffuseWithTexture_Diff;
 var LightSpecularWithTexture_Diff = '\tvec3 specular = light.specular * spec * material.specular;\n';
 exports.LightSpecularWithTexture_Diff = LightSpecularWithTexture_Diff;
@@ -3144,22 +3115,7 @@ var LightAmbientWithTexture_Spec = '\tvec3 ambient = light.ambient * material.di
 exports.LightAmbientWithTexture_Spec = LightAmbientWithTexture_Spec;
 var LightDiffuseWithTexture_Spec = '\tvec3 diffuse = light.ambient * material.diffuse;\n';
 exports.LightDiffuseWithTexture_Spec = LightDiffuseWithTexture_Spec;
-var LightSpecularWithTexture_Spec = '\tvec3 specular = light.specular * spec * vec3(texture(specularTexture, fSpecularTextCoords));\n';
-/* export const DirLightFuncImpl = `vec3 CalcDirLight(DirectionalLight light, vec3 normal, vec3 viewDir)
-{
-    vec3 lightDir = normalize(-light.direction);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    // combine results
-    vec3 ambient = light.ambient * material.diffuse;
-    vec3 diffuse = light.diffuse * diff * material.diffuse;
-    vec3 specular = light.specular * spec * material.specular;
-    return (ambient + diffuse + specular);
-}\n` */
-
+var LightSpecularWithTexture_Spec = '\tvec3 specular = light.specular * spec * vec3(texture(specularTexture, fTextureCoords));\n';
 exports.LightSpecularWithTexture_Spec = LightSpecularWithTexture_Spec;
 
 var DirLightFuncImplObj = function DirLightFuncImplObj() {
@@ -3172,27 +3128,6 @@ var DirLightFuncImplObj = function DirLightFuncImplObj() {
     bodyReturn: '\treturn (ambient + diffuse + specular);\n}\n'
   };
 };
-/* export const PointLightFuncImpl = `vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
-{
-    vec3 lightDir = normalize(light.position - fragPos);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    // attenuation
-    float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
-    // combine results
-    vec3 ambient = light.ambient * material.diffuse;
-    vec3 diffuse = light.diffuse * diff * material.diffuse;
-    vec3 specular = light.specular * spec * material.specular;
-    ambient *= attenuation;
-    diffuse *= attenuation;
-    specular *= attenuation;
-    return (ambient + diffuse + specular);
-}\n`; */
-
 
 exports.DirLightFuncImplObj = DirLightFuncImplObj;
 
@@ -3207,31 +3142,6 @@ var PointLightFuncImplObj = function PointLightFuncImplObj() {
     bodyReturn: '\treturn (ambient + diffuse + specular);\n}\n'
   };
 };
-/* export const SpotLightFuncImpl = `vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
-{
-    vec3 lightDir = normalize(light.position - fragPos);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    // attenuation
-    float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
-    // spotlight intensity
-    float theta = dot(lightDir, normalize(-light.direction)); 
-    float epsilon = light.cutOff - light.outerCutOff;
-    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-    // combine results
-    vec3 ambient = light.ambient * material.ambient;
-    vec3 diffuse = light.diffuse * diff * material.diffuse;
-    vec3 specular = light.specular * spec * material.specular;
-    ambient *= attenuation * intensity;
-    diffuse *= attenuation * intensity;
-    specular *= attenuation * intensity;
-    return (ambient + diffuse + specular);
-}\n`; */
-
 
 exports.PointLightFuncImplObj = PointLightFuncImplObj;
 
@@ -3246,11 +3156,6 @@ var SpotLightFuncImplObj = function SpotLightFuncImplObj() {
     bodyReturn: '\treturn (ambient + diffuse + specular);\n}\n'
   };
 };
-/* 
-vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords)); */
-
 
 exports.SpotLightFuncImplObj = SpotLightFuncImplObj;
 var materialVar = 'uniform Material material;\n';
@@ -3269,18 +3174,10 @@ var shadowMapVar = 'uniform sampler2D shadowTexture;\n';
 exports.shadowMapVar = shadowMapVar;
 var normalMapVar = 'uniform sampler2D normalTexture;\n';
 exports.normalMapVar = normalMapVar;
+var fTextureCoords = 'in vec2 fTextureCoords;\n';
+exports.fTextureCoords = fTextureCoords;
 var fDiffuseCoords = 'in vec2 fDiffuseTextCoords;\n';
 exports.fDiffuseCoords = fDiffuseCoords;
-var fSpecularCoords = 'in vec2 fSpecularTextCoords;\n';
-exports.fSpecularCoords = fSpecularCoords;
-var fLightCoords = 'in vec2 fLightTextCoords;\n';
-exports.fLightCoords = fLightCoords;
-var fBumpCoords = 'in vec2 fBumpTextCoords;\n';
-exports.fBumpCoords = fBumpCoords;
-var fShadowCoords = 'in vec2 fShadowTextCoords;\n';
-exports.fShadowCoords = fShadowCoords;
-var fNormalCoords = 'in vec2 fNormalTextCoords;\n';
-exports.fNormalCoords = fNormalCoords;
 var fOutput_Lights = '\tfragColor = vec4(lightColor, 1.0);\n';
 exports.fOutput_Lights = fOutput_Lights;
 var fOutput_Lights_Color = '\tfragColor = vec4(lightColor, 1.0) * fColor;\n';
@@ -3425,33 +3322,9 @@ var ShaderFactory = /*#__PURE__*/function () {
         var textures = props.material.textures;
 
         if (textures) {
-          if (textures[_constants.TextureTypes.DiffuseMap]) {
-            vertexSource.diffuseCoordsIn = shaderDefault.vDiffuseCoords_In;
-            vertexSource.diffuseCoordsOut = shaderDefault.vDiffuseCoords_Out;
-            vertexSource.diffuseAssign = shaderDefault.vDiffuseCoords_Assign;
-          }
-
-          if (textures[_constants.TextureTypes.SpecularMap]) {
-            vertexSource.specularCoordsIn = shaderDefault.vSpecularCoords_In;
-            vertexSource.specularCoordsOut = shaderDefault.vSpecularCoords_Out;
-            vertexSource.specularAssign = shaderDefault.vSpecularCoords_Assign;
-          }
-          /* if(textures[TextureTypes.LightMap]){
-              vertexSource.specularCoordsIn = shaderDefault.vSpecularCoords_In;
-              vertexSource.specularCoordsOut = shaderDefault.vSpecularCoords_Out;
-              vertexSource.specularAssign = shaderDefault.vSpecularCoords_Assign;
-          } 
-          if(textures[TextureTypes.BumpMap]){
-              vertexSource.specularCoordsIn = shaderDefault.vSpecularCoords_In;
-              vertexSource.specularCoordsOut = shaderDefault.vSpecularCoords_Out;
-              vertexSource.specularAssign = shaderDefault.vSpecularCoords_Assign;
-          } 
-          if(textures[TextureTypes.ShadowMap]){
-              vertexSource.specularCoordsIn = shaderDefault.vSpecularCoords_In;
-              vertexSource.specularCoordsOut = shaderDefault.vSpecularCoords_Out;
-              vertexSource.specularAssign = shaderDefault.vSpecularCoords_Assign;
-          } */
-
+          vertexSource.textureCoordsIn = shaderDefault.vTextureCoords_In;
+          vertexSource.textureCoordsOut = shaderDefault.vTextureCoords_Out;
+          vertexSource.textureCoordsAssign = shaderDefault.vTextureCoords_Assign;
         }
       }
 
@@ -3487,30 +3360,28 @@ var ShaderFactory = /*#__PURE__*/function () {
         var textures = props.material.textures;
 
         if (textures) {
+          fragmentSource.texturesCoords = shaderDefault.fTextureCoords;
+
           if (textures[_constants.TextureTypes.DiffuseMap]) {
-            fragmentSource.samplers += shaderDefault.diffuseMapVar;
-            fragmentSource.texturesCoords += shaderDefault.fDiffuseCoords;
+            fragmentSource.samplers += shaderDefault.diffuseMapVar; //fragmentSource.texturesCoords += shaderDefault.fDiffuseCoords;
+
             hasTexture.hasDiffuseTexture = true;
           }
 
           if (textures[_constants.TextureTypes.SpecularMap]) {
-            fragmentSource.samplers += shaderDefault.specularMapVar;
-            fragmentSource.texturesCoords += shaderDefault.fSpecularCoords;
+            fragmentSource.samplers += shaderDefault.specularMapVar; //fragmentSource.texturesCoords += shaderDefault.fSpecularCoords;
           }
 
           if (textures[_constants.TextureTypes.LightMap]) {
-            fragmentSource.samplers += shaderDefault.lightMapVar;
-            fragmentSource.texturesCoords += shaderDefault.fLightCoords;
+            fragmentSource.samplers += shaderDefault.lightMapVar; //fragmentSource.texturesCoords += shaderDefault.fLightCoords;
           }
 
           if (textures[_constants.TextureTypes.BumpMap]) {
-            fragmentSource.samplers += shaderDefault.bumbMapVar;
-            fragmentSource.texturesCoords += shaderDefault.fBumpCoords;
+            fragmentSource.samplers += shaderDefault.bumbMapVar; //fragmentSource.texturesCoords += shaderDefault.fBumpCoords;
           }
 
           if (textures[_constants.TextureTypes.ShadowMap]) {
-            fragmentSource.samplers += shaderDefault.shadowMapVar;
-            fragmentSource.texturesCoords += shaderDefault.fShadowCoords;
+            fragmentSource.samplers += shaderDefault.shadowMapVar; //fragmentSource.texturesCoords += shaderDefault.fShadowCoords;
           }
 
           fragmentSource.textureCalc = this.getTexturesCalc(props.material.textures);
@@ -3802,7 +3673,7 @@ var Mesh = /*#__PURE__*/function () {
           this.textCoordBuffer = gl.createBuffer();
           gl.bindBuffer(gl.ARRAY_BUFFER, this.textCoordBuffer);
           gl.bufferData(gl.ARRAY_BUFFER, (0, _Vector_Matrix.flatten)(this.textCoords), gl.STATIC_DRAW);
-          var textCoordLoc = gl.getAttribLocation(this.shaders.program.program, 'vDiffuseTextCoords');
+          var textCoordLoc = gl.getAttribLocation(this.shaders.program.program, 'vTextureCoords');
           gl.vertexAttribPointer(textCoordLoc, 2, gl.FLOAT, false, 0, 0);
           gl.enableVertexAttribArray(textCoordLoc);
         }
@@ -4226,6 +4097,10 @@ var Texture = /*#__PURE__*/function () {
   }, {
     key: "ActiveTexture",
     value: function ActiveTexture(gl) {
+      if (this.params) {
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this.params.flipY);
+      }
+
       gl.activeTexture(gl.TEXTURE0 + this.textureUnit);
       gl.bindTexture(gl.TEXTURE_2D, this.texture);
     }
@@ -5867,8 +5742,6 @@ var ObjLoader = /*#__PURE__*/function (_ModelLoader) {
           material = {};
           materials[unparsedArgs] = material;
         },
-
-        /* eslint brace-style:0 */
         Ns: function Ns(parts) {
           material.shininess = parseFloat(parts[0]);
         },
@@ -5943,7 +5816,47 @@ var ObjLoader = /*#__PURE__*/function (_ModelLoader) {
 }(_ModelLoader2.ModelLoader);
 
 exports.ObjLoader = ObjLoader;
-},{"@babel/runtime/helpers/slicedToArray":"node_modules/@babel/runtime/helpers/slicedToArray.js","@babel/runtime/helpers/toConsumableArray":"node_modules/@babel/runtime/helpers/toConsumableArray.js","@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js","@babel/runtime/helpers/inherits":"node_modules/@babel/runtime/helpers/inherits.js","@babel/runtime/helpers/possibleConstructorReturn":"node_modules/@babel/runtime/helpers/possibleConstructorReturn.js","@babel/runtime/helpers/getPrototypeOf":"node_modules/@babel/runtime/helpers/getPrototypeOf.js","./ModelLoader":"src/common/Loaders/ModelLoader.js"}],"src/index.js":[function(require,module,exports) {
+},{"@babel/runtime/helpers/slicedToArray":"node_modules/@babel/runtime/helpers/slicedToArray.js","@babel/runtime/helpers/toConsumableArray":"node_modules/@babel/runtime/helpers/toConsumableArray.js","@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js","@babel/runtime/helpers/inherits":"node_modules/@babel/runtime/helpers/inherits.js","@babel/runtime/helpers/possibleConstructorReturn":"node_modules/@babel/runtime/helpers/possibleConstructorReturn.js","@babel/runtime/helpers/getPrototypeOf":"node_modules/@babel/runtime/helpers/getPrototypeOf.js","./ModelLoader":"src/common/Loaders/ModelLoader.js"}],"src/common/Utils/NormalsGenerator.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.generateTangents = generateTangents;
+
+var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
+
+var _Vector_Matrix = require("./Vector_Matrix");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var toVec3 = function toVec3(v) {
+  return (0, _Vector_Matrix.vec3)(v[0], v[1], v[2]);
+};
+
+function generateTangents(verteces, texcoords, indices) {
+  var numFaces = verteces.length / 3;
+  var tangents = [];
+
+  for (var i = 0; i < numFaces; i++) {
+    var p1 = toVec3(verteces[i]);
+    var p2 = toVec3(verteces[i + 1]);
+    var p3 = toVec3(verteces[i + 2]);
+    var uv1 = texcoords[i];
+    var uv2 = texcoords[i + 1];
+    var uv3 = texcoords[i + 2];
+    var edge1 = (0, _Vector_Matrix.subtract)(p2, p1);
+    var edge2 = (0, _Vector_Matrix.subtract)(p3, p1);
+    var deltaUV1 = (0, _Vector_Matrix.subtract)(uv2, uv1);
+    var deltaUV2 = (0, _Vector_Matrix.subtract)(uv3, uv1);
+    var f = 1.0 / (deltaUV1[0] * deltaUV2[1] - deltaUV2[0] * deltaUV1[1]);
+    var tangent = Number.isFinite(f) ? (0, _Vector_Matrix.normalize)((0, _Vector_Matrix.scale)(f, (0, _Vector_Matrix.subtract)((0, _Vector_Matrix.scale)(deltaUV2[1], edge1), (0, _Vector_Matrix.scale)(deltaUV1[1], edge2)))) : [1, 0, 0];
+    tangents.push.apply(tangents, (0, _toConsumableArray2.default)(tangent).concat((0, _toConsumableArray2.default)(tangent), (0, _toConsumableArray2.default)(tangent)));
+  }
+
+  return tangents;
+}
+},{"@babel/runtime/helpers/toConsumableArray":"node_modules/@babel/runtime/helpers/toConsumableArray.js","./Vector_Matrix":"src/common/Utils/Vector_Matrix.js"}],"src/index.js":[function(require,module,exports) {
 "use strict";
 
 require("./styles.css");
@@ -5978,7 +5891,7 @@ var _Request = require("./common/Utils/Request");
 
 var _ObjLoader = require("./common/Loaders/ObjLoader");
 
-var _Time = require("./common/Time");
+var _NormalsGenerator = require("./common/Utils/NormalsGenerator");
 
 /**
  * @author Alberto Contorno
@@ -6031,26 +5944,54 @@ Promise.all([req.send(), reqMtl.send()]).then(function (res) {
     var oo = new _Object.SceneObject(null, 'test load');
     var verts = [];
     var verts_n = [];
+    var text_coords = [];
     var colors;
     var data = g.data;
+    var tangents;
 
     for (var i = 0; i < data.position.length - 2; i += 3) {
       verts.push((0, _Vector_Matrix.vec4)(data.position[i], data.position[i + 1], data.position[i + 2], 1.0));
       verts_n.push((0, _Vector_Matrix.vec3)(data.normal[i], data.normal[i + 1], data.normal[i + 2]));
     }
 
+    for (var _i = 0; _i < data.texcoord.length - 1; _i += 2) {
+      text_coords.push((0, _Vector_Matrix.vec2)(data.texcoord[_i], data.texcoord[_i + 1], 1.0));
+    }
+
     if (data.color) {
       colors = [];
 
-      for (var _i = 0; _i < data.color.length - 2; _i += 3) {
-        colors.push((0, _Vector_Matrix.vec4)(data.color[_i], data.color[_i + 1], data.color[_i + 2], 1.0));
+      for (var _i2 = 0; _i2 < data.color.length - 2; _i2 += 3) {
+        colors.push((0, _Vector_Matrix.vec4)(data.color[_i2], data.color[_i2 + 1], data.color[_i2 + 2], 1.0));
       }
     }
 
-    oo.addMesh(new _Mesh.Mesh(gl, verts, null, null, null, null, null, verts_n, colors));
+    if (data.texcoord && data.normal) {
+      tangents = (0, _NormalsGenerator.generateTangents)(verts, text_coords);
+    }
+
+    var ooMesh = new _Mesh.Mesh(gl, verts, null, null, null, null, text_coords, verts_n, colors);
+    oo.addMesh(ooMesh);
     oo.parent = o;
     scene.addObject(oo);
     var ooMat = mtl[g.material];
+
+    if (ooMat['diffuseMap']) {
+      var diffuseMap = new _Texture.Texture(0, null, 'assets/' + ooMat['diffuseMap'], gl.RGB, gl.RGB, {
+        flipY: true
+      });
+      diffuseMap.LoadTexture(gl);
+      ooMesh.textures.DIFFUSE_MAP = diffuseMap;
+    }
+
+    if (ooMat['specularMap']) {
+      var specularMap = new _Texture.Texture(1, null, 'assets/' + ooMat['specularMap'], gl.RGB, gl.RGB, {
+        flipY: true
+      });
+      specularMap.LoadTexture(gl);
+      ooMesh.textures.SPECULAR_MAP = specularMap;
+    }
+
     oo.material = new _Material.Material(ooMat.ambient, ooMat.diffuse, ooMat.specular, ooMat.shininess);
   });
   o.transform.position = [-2, 3, 0]; //o.transform.scale = [.5,.5,.5]
@@ -6128,9 +6069,8 @@ function handleInputs() {
 
     if (inputs.isKeyDown(inputs.keyCodes.KEYNAMES.o)) {
       pointLight_obj.transform.position[0] = 4 * Math.sin(engine.time.time);
-      pointLight.position[0] = 4 * Math.sin(engine.time.time);
       pointLight_obj.transform.position[2] = 4 * Math.cos(engine.time.time);
-      pointLight.position[2] = 4 * Math.cos(engine.time.time);
+      pointLight.position = pointLight_obj.transform.position;
     }
   }
 
@@ -6197,14 +6137,15 @@ robotUpperArm.transform.scale = [0.3, 1, 0.3];
 var dirLight = new _DirectionalLight.DirectionalLight();
 dirLight.ambient = (0, _Vector_Matrix.vec3)(0.1, 0.1, 0.1);
 dirLight.diffuse = (0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0);
+dirLight.direction = (0, _Vector_Matrix.vec3)(0.3, -1.0, 0.1);
 var pointLight_obj = new _Object.SceneObject(null, 'dirLight');
 pointLight_obj.material = new _Material.Material((0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0), (0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0));
 scene.addObject(pointLight_obj);
 pointLight_obj.addMesh(cube);
-pointLight_obj.transform.position = [0.0, 4.0, -7.0];
+pointLight_obj.transform.position = [0.0, 6, -7.0];
 pointLight_obj.transform.scale = [.2, .2, .2];
 var pointLight = new _PointLight.PointLight();
-pointLight.position = (0, _Vector_Matrix.vec3)(0.0, 4.0, -7.0);
+pointLight.position = (0, _Vector_Matrix.vec3)(0.0, 4, -7.0);
 pointLight.diffuse = (0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0);
 var pointLight_obj2 = new _Object.SceneObject(null, 'dirLight');
 pointLight_obj2.material = new _Material.Material((0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0), (0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0));
@@ -6242,7 +6183,7 @@ function main() {
 }
 
 main();
-},{"./styles.css":"src/styles.css","./common/webgl-utils":"src/common/webgl-utils.js","./common/Engine":"src/common/Engine.js","./common/inputManager":"src/common/inputManager.js","./common/Scene":"src/common/Scene.js","./common/Camera":"src/common/Camera.js","./common/Object":"src/common/Object.js","./common/Mesh":"src/common/Mesh.js","./common/Texture":"src/common/Texture.js","./common/Components/DirectionalLight":"src/common/Components/DirectionalLight.js","./common/Components/PointLight":"src/common/Components/PointLight.js","./common/Components/SpotLight":"src/common/Components/SpotLight.js","./common/Utils/Vector_Matrix":"src/common/Utils/Vector_Matrix.js","./common/Material":"src/common/Material.js","./common/Utils/Request":"src/common/Utils/Request.js","./common/Loaders/ObjLoader":"src/common/Loaders/ObjLoader.js","./common/Time":"src/common/Time.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./styles.css":"src/styles.css","./common/webgl-utils":"src/common/webgl-utils.js","./common/Engine":"src/common/Engine.js","./common/inputManager":"src/common/inputManager.js","./common/Scene":"src/common/Scene.js","./common/Camera":"src/common/Camera.js","./common/Object":"src/common/Object.js","./common/Mesh":"src/common/Mesh.js","./common/Texture":"src/common/Texture.js","./common/Components/DirectionalLight":"src/common/Components/DirectionalLight.js","./common/Components/PointLight":"src/common/Components/PointLight.js","./common/Components/SpotLight":"src/common/Components/SpotLight.js","./common/Utils/Vector_Matrix":"src/common/Utils/Vector_Matrix.js","./common/Material":"src/common/Material.js","./common/Utils/Request":"src/common/Utils/Request.js","./common/Loaders/ObjLoader":"src/common/Loaders/ObjLoader.js","./common/Utils/NormalsGenerator":"src/common/Utils/NormalsGenerator.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -6270,7 +6211,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53346" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55005" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

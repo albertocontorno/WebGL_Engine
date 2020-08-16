@@ -84,7 +84,7 @@ export class Mesh{
         this.textCoordBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.textCoordBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, flatten(this.textCoords), gl.STATIC_DRAW);
-        let textCoordLoc = gl.getAttribLocation(this.shaders.program.program, 'vDiffuseTextCoords');
+        let textCoordLoc = gl.getAttribLocation(this.shaders.program.program, 'vTextureCoords');
         gl.vertexAttribPointer(textCoordLoc, 2, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(textCoordLoc);
       }

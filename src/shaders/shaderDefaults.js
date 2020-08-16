@@ -2,32 +2,17 @@ export const vColor_In = 'in vec4 vColor;\n';
 export const vColor_Out = 'out vec4 fColor;\n';
 export const vColor_Assign = 'fColor = vColor;\n';
 
-export const vDiffuseCoords_In = 'in vec2 vDiffuseTextCoords;\n';
-export const vSpecularCoords_In = 'in vec2 vSpecularTextCoords;\n';
-export const vLightCoords_In = 'in vec2 vLightTextCoords;\n';
-export const vBumpCoords_In = 'in vec2 vBumpTextCoords;\n';
-export const vShadowCoords_In = 'in vec2 vShadowTextCoords;\n';
-export const vNormalCoords_In = 'in vec2 vNormalTextCoords;\n';
-
-export const vDiffuseCoords_Out = 'out vec2 fDiffuseTextCoords;\n';
-export const vSpecularCoords_Out = 'out vec2 fSpecularTextCoords;\n';
-export const vLightCoords_Out = 'out vec2 fLightTextCoords;\n';
-export const vBumpCoords_Out = 'out vec2 fBumpTextCoords;\n';
-export const vShadowCoords_Out = 'out vec2 fShadowTextCoords;\n';
-export const vNormalCoords_Out = 'out vec2 fNormalTextCoords;\n';
-
-export const vDiffuseCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\n';
-export const vSpecularCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\n';
-export const vLightCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\n';
-export const vBumpCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\n';
-export const vShadowCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\n';
-export const vNormalCoords_Assign = '\tfDiffuseTextCoords = vDiffuseTextCoords;\n';
+export const vTextureCoords_In = 'in vec2 vTextureCoords;\n';
+export const vTextureCoords_Out = 'out vec2 fTextureCoords;\n';
+export const vTextureCoords_Assign = '\tfTextureCoords = vTextureCoords;\n';
 
 export const vertexCompleteShaderObj = () =>({
   version: "#version 300 es\n",
   position: "in vec4 vPosition;\n",
   colorIn: '',
+  textureCoordsIn: '',
   diffuseCoordsIn: '',
+  textureCoordsOut: '',
   diffuseCoordsOut: '',
   specularCoordsIn: '',
   specularCoordsOut: '',
@@ -41,6 +26,7 @@ export const vertexCompleteShaderObj = () =>({
   mainStart: "void main(){\n",
   mainBody: "\tfNormal = mat3(transpose(inverse(model))) * vNormal;\n"+
   "\tfPos = vec3(model * vPosition);\n",
+  textureCoordsAssign: '',
   diffuseAssign: '',
   specularAssign: '',
   normalAssign: '',
@@ -94,32 +80,17 @@ export const DirLightFuncDec = 'vec3 CalcDirLight(DirectionalLight light, vec3 n
 export const PointLightFuncDec = 'vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);\n';
 export const SpotLightFuncDec = 'vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);\n';
 
-export const LightAmbientWithTexture_Diff_Spec = '\tvec3 ambient = light.ambient * vec3(texture(diffuseTexture, fDiffuseTextCoords));\n'
-export const LightDiffuseWithTexture_Diff_Spec = '\tvec3 diffuse = light.diffuse * diff * vec3(texture(diffuseTexture, fDiffuseTextCoords));\n'
-export const LightSpecularWithTexture_Diff_Spec = '\tvec3 specular = light.specular * spec * vec3(texture(specularTexture, fSpecularTextCoords));\n'
+export const LightAmbientWithTexture_Diff_Spec = '\tvec3 ambient = light.ambient * vec3(texture(diffuseTexture, fTextureCoords));\n'
+export const LightDiffuseWithTexture_Diff_Spec = '\tvec3 diffuse = light.diffuse * diff * vec3(texture(diffuseTexture, fTextureCoords));\n'
+export const LightSpecularWithTexture_Diff_Spec = '\tvec3 specular = light.specular * spec * vec3(texture(specularTexture, fTextureCoords));\n'
 
-export const LightAmbientWithTexture_Diff = '\tvec3 ambient = light.ambient * vec3(texture(diffuseTexture, fDiffuseTextCoords));\n'
-export const LightDiffuseWithTexture_Diff = '\tvec3 diffuse = light.diffuse * diff * vec3(texture(diffuseTexture, fDiffuseTextCoords));\n'
+export const LightAmbientWithTexture_Diff = '\tvec3 ambient = light.ambient * vec3(texture(diffuseTexture, fTextureCoords));\n'
+export const LightDiffuseWithTexture_Diff = '\tvec3 diffuse = light.diffuse * diff * vec3(texture(diffuseTexture, fTextureCoords));\n'
 export const LightSpecularWithTexture_Diff = '\tvec3 specular = light.specular * spec * material.specular;\n'
 
 export const LightAmbientWithTexture_Spec = '\tvec3 ambient = light.ambient * material.diffuse;\n'
 export const LightDiffuseWithTexture_Spec = '\tvec3 diffuse = light.ambient * material.diffuse;\n'
-export const LightSpecularWithTexture_Spec = '\tvec3 specular = light.specular * spec * vec3(texture(specularTexture, fSpecularTextCoords));\n'
-
-/* export const DirLightFuncImpl = `vec3 CalcDirLight(DirectionalLight light, vec3 normal, vec3 viewDir)
-{
-    vec3 lightDir = normalize(-light.direction);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    // combine results
-    vec3 ambient = light.ambient * material.diffuse;
-    vec3 diffuse = light.diffuse * diff * material.diffuse;
-    vec3 specular = light.specular * spec * material.specular;
-    return (ambient + diffuse + specular);
-}\n` */
+export const LightSpecularWithTexture_Spec = '\tvec3 specular = light.specular * spec * vec3(texture(specularTexture, fTextureCoords));\n'
 
 export const DirLightFuncImplObj = () =>({
   signature: 'vec3 CalcDirLight(DirectionalLight light, vec3 normal, vec3 viewDir){\n',
@@ -136,27 +107,6 @@ export const DirLightFuncImplObj = () =>({
   bodyReturn: '\treturn (ambient + diffuse + specular);\n}\n'
 });
 
-
-/* export const PointLightFuncImpl = `vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
-{
-    vec3 lightDir = normalize(light.position - fragPos);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    // attenuation
-    float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
-    // combine results
-    vec3 ambient = light.ambient * material.diffuse;
-    vec3 diffuse = light.diffuse * diff * material.diffuse;
-    vec3 specular = light.specular * spec * material.specular;
-    ambient *= attenuation;
-    diffuse *= attenuation;
-    specular *= attenuation;
-    return (ambient + diffuse + specular);
-}\n`; */
 
 export const PointLightFuncImplObj = () =>({
   signature: 'vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir){\n',
@@ -178,31 +128,6 @@ export const PointLightFuncImplObj = () =>({
   \tspecular *= attenuation;\n`,
   bodyReturn: '\treturn (ambient + diffuse + specular);\n}\n'
 });
-
-/* export const SpotLightFuncImpl = `vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
-{
-    vec3 lightDir = normalize(light.position - fragPos);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    // attenuation
-    float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
-    // spotlight intensity
-    float theta = dot(lightDir, normalize(-light.direction)); 
-    float epsilon = light.cutOff - light.outerCutOff;
-    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-    // combine results
-    vec3 ambient = light.ambient * material.ambient;
-    vec3 diffuse = light.diffuse * diff * material.diffuse;
-    vec3 specular = light.specular * spec * material.specular;
-    ambient *= attenuation * intensity;
-    diffuse *= attenuation * intensity;
-    specular *= attenuation * intensity;
-    return (ambient + diffuse + specular);
-}\n`; */
 
 export const SpotLightFuncImplObj = () =>({
   signature: 'vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir){\n',
@@ -229,11 +154,6 @@ export const SpotLightFuncImplObj = () =>({
   bodyReturn: '\treturn (ambient + diffuse + specular);\n}\n'
 });
 
-/* 
-vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords)); */
-
 export const materialVar = 'uniform Material material;\n';
 export const fColorIn = 'in vec4 fColor;\n';
 
@@ -244,12 +164,8 @@ export const bumbMapVar = 'uniform sampler2D bumpTexture;\n';
 export const shadowMapVar = 'uniform sampler2D shadowTexture;\n';
 export const normalMapVar = 'uniform sampler2D normalTexture;\n';
 
+export const fTextureCoords = 'in vec2 fTextureCoords;\n';
 export const fDiffuseCoords = 'in vec2 fDiffuseTextCoords;\n';
-export const fSpecularCoords = 'in vec2 fSpecularTextCoords;\n';
-export const fLightCoords = 'in vec2 fLightTextCoords;\n';
-export const fBumpCoords = 'in vec2 fBumpTextCoords;\n';
-export const fShadowCoords = 'in vec2 fShadowTextCoords;\n';
-export const fNormalCoords = 'in vec2 fNormalTextCoords;\n';
 
 export const fOutput_Lights = '\tfragColor = vec4(lightColor, 1.0);\n'
 export const fOutput_Lights_Color = '\tfragColor = vec4(lightColor, 1.0) * fColor;\n'
