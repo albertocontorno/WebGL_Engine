@@ -3,7 +3,7 @@ import {ShaderProgram} from './ShaderProgram';
 import {ShaderFactory} from '../shaders/ShaderFactory';
 import { vec3, flatten, mat4, translate, rotate, rotateX, rotateY, rotateZ, scalem, mult } from './Utils/Vector_Matrix';
 import { Material } from './Material';
-import { LightTypes } from "./Utils/constants";
+import { LightTypes, TextureTypes } from "./Utils/constants";
 /**
  * @author Alberto Contorno
  * @class
@@ -18,6 +18,7 @@ export class Mesh{
   VBO;
   EBO;
   NBO;
+  TBO;
   type;
   locations = {};
   textures = {}; // {diffuseMap, specularMap, normalMap, BumbpMap, shadowMap}
@@ -38,7 +39,7 @@ export class Mesh{
    * @param {*} textures // props.material.textures = {  DIFFUSE_MAP: 1, SPECULAR_MAP: 1, NORMAL_MAP: 1, LIGHT_MAP: 1, BUMP_MAP: 1, SHADOW_MAP: 1 };
    * @param {*} textCoords 
    */
-  constructor(gl, vertices, indices, shaders, opt, textures, textCoords, normals, colors){
+  constructor(gl, vertices, indices, shaders, opt, textures, textCoords, normals, tangents, colors){
     Mesh.nextId++;
     this.gl = gl;
     this.id = Mesh.nextId;
@@ -50,6 +51,7 @@ export class Mesh{
     this.textures = Object.assign({ DIFFUSE_MAP: null, SPECULAR_MAP: null, NORMAL_MAP: null, LIGHT_MAP: null, BUMP_MAP: null, SHADOW_MAP: null}, textures);;
     this.textCoords = textCoords;
     this.normals = normals;
+    this.tangents = tangents;
 
     this.shaders = {};
     //Create shader if passed else do it automatically from info
@@ -76,6 +78,16 @@ export class Mesh{
       let normalLoc = gl.getAttribLocation(this.shaders.program.program, 'vNormal');
       gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 0, 0);
       gl.enableVertexAttribArray(normalLoc);
+    }
+
+    if (this.tangents) {
+      this.TBO = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.TBO);
+      gl.bufferData(gl.ARRAY_BUFFER, flatten(this.tangents), gl.STATIC_DRAW);
+      let tangentLoc = gl.getAttribLocation(this.shaders.program.program, 'vTangent');
+      console.log('tangentLoc', tangentLoc, this.shaders.fragment.source);
+      gl.vertexAttribPointer(tangentLoc, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(tangentLoc);
     }
 
     this.locations.textures = {};
@@ -223,6 +235,22 @@ export class Mesh{
         }
       }
     }
+
+    this.locations.texturesLocs = {};
+    Object.entries(this.textures).forEach(([k, texture]) => {
+      if (texture){
+        if(k === TextureTypes.DiffuseMap){
+          this.locations.texturesLocs[TextureTypes.DiffuseMap] = gl.getUniformLocation(this.shaders.program.program, 'diffuseTexture');
+        } else if(k === TextureTypes.SpecularMap){
+          this.locations.texturesLocs[TextureTypes.SpecularMap] = gl.getUniformLocation(this.shaders.program.program, 'specularTexture');
+        } else if(k === TextureTypes.NormalMap){
+          this.locations.texturesLocs[TextureTypes.NormalMap] = gl.getUniformLocation(this.shaders.program.program, 'normalTexture');
+        } else if(k === TextureTypes.ShadowMap){
+          this.locations.texturesLocs[TextureTypes.ShadowMap] = gl.getUniformLocation(this.shaders.program.program, 'shadowTexture');
+        } 
+      }
+    });
+
   }
 
   updateShadersAndProgram(material, lights, lightsTypes, name){
@@ -243,8 +271,6 @@ export class Mesh{
       let f = ShaderFactory.CreateFragmentShaderFromProperties(props, name);
       this.shaders.vertex = new Shader(this.gl, 'vertex', v);;
       this.shaders.fragment = new Shader(this.gl, 'fragment', f);
-
-      console.log(this.id, name, this.textures, props);
 
       let shaders = [];
       for(let key in this.shaders){
@@ -306,9 +332,12 @@ export class Mesh{
         }
       }
     }
+    
+    Object.entries(this.locations.texturesLocs).forEach(([k, loc]) => {
+      gl.uniform1i(loc, this.textures[k].textureUnit);
+    });
 
     Object.values(this.textures).forEach(texture => {
-      //load texture path
       if (texture) texture.ActiveTexture(gl);
     });
 
@@ -351,13 +380,41 @@ export class Mesh{
   }
 
   setupPointLight(gl, lightLocs, light) {
-    gl.uniform3fv(lightLocs.position, light.light.position);
+    /* gl.uniform3fv(lightLocs.position, light.light.position);
     gl.uniform3fv(lightLocs.ambient, light.light.ambient);
     gl.uniform3fv(lightLocs.diffuse, light.light.diffuse);
     gl.uniform3fv(lightLocs.specular, light.light.specular);
     gl.uniform1f(lightLocs.constant, light.light.constant);
     gl.uniform1f(lightLocs.linear, light.light.linear);
-    gl.uniform1f(lightLocs.quadratic, light.light.quadratic);
+    gl.uniform1f(lightLocs.quadratic, light.light.quadratic); */
+    Object.keys(lightLocs).forEach( k => {
+      switch (k) {
+        case 'position':
+          gl.uniform3fv(lightLocs.position, light.light.position);
+          break;
+        case 'ambient':
+          gl.uniform3fv(lightLocs.ambient, light.light.ambient);
+          break;
+        case 'diffuse':
+          gl.uniform3fv(lightLocs.diffuse, light.light.diffuse);
+          break;
+        case 'specular':
+          gl.uniform3fv(lightLocs.specular, light.light.specular);
+          break;
+        case 'constant':
+          gl.uniform1f(lightLocs.constant, light.light.constant);
+          break;
+        case 'linear':
+          gl.uniform1f(lightLocs.linear, light.light.linear);
+          break;
+        case 'quadratic':
+          gl.uniform1f(lightLocs.quadratic, light.light.quadratic);
+          break;
+      
+        default:
+          break;
+      }
+    });
   }
 
   setupSpotLight(gl, lightLocs, light) {

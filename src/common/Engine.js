@@ -18,7 +18,7 @@ export class Engine{ //TODO SCENE MANAGER
      * @param {WebGL_Context} gl The WebGl context obtained from a canvas. This will be the context of the entire Engine.
      * used as the context of every Shader.
      */
-    constructor(gl, opt){
+    constructor(gl, opt = {clearColor: [0.0, 0.0, 0.0, 1.0]}){
       Math.radians = degrees => {
         var pi = Math.PI;
         return degrees * (pi / 180);
@@ -35,6 +35,9 @@ export class Engine{ //TODO SCENE MANAGER
       if(this.opt){
         if(this.opt.showFps){
           this.setFpsCounter();
+        }
+        if(!this.opt.clearColor){
+          this.opt.clearColor = [0.0, 0.0, 0.0, 1.0];
         }
       }
     }
@@ -56,7 +59,7 @@ export class Engine{ //TODO SCENE MANAGER
      * Starts the rendering and the update of the time at every frame.
      */
     doRendering() {
-      this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      this.gl.clearColor(...this.opt.clearColor);
       this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
       if (this.scenes[this.activeScene] && this.scenes[this.activeScene].mainCamera){
         this.scenes[this.activeScene].renderScene(this.gl);
@@ -72,7 +75,7 @@ export class Engine{ //TODO SCENE MANAGER
       `position: absolute;
       top: 10px;
       left: 20px;
-      color: yellow;`);
+      color: lime;`);
       container.id = 'glFpsCounterContainer_' + idNum;
       let text = document.createElement('p');
       text.id = 'glFpsCounterText_'+ idNum;

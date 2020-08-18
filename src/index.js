@@ -27,7 +27,7 @@ const canvas = document.getElementById("app");
 inputs.lockMouse(canvas);
 const gl = WebGLUtils.setupWebGL(canvas);
 var aspect = gl.drawingBufferWidth / gl.drawingBufferHeight;
-var camera = new Camera(vec3(0, 0, 0), up, 5, "perspective", {},
+var camera = new Camera(vec3(0, 0, 5), up, 5, "perspective", {},
   { fov: 45, aspect: aspect, near: 0.1, far: 100 },
   25, { maxLevel: 3, 0: 30, 1: 45, 2: 75, 3: 90 }, 1
 );
@@ -38,10 +38,8 @@ var camera = new Camera(vec3(0, 0, 0), up, 5, "perspective", {},
 gl.enable(gl.DEPTH_TEST);
 //gl.enable(gl.CULL_FACE);
 gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-gl.clearColor(0.0, 0.0, 0.0, 1.0);
-var engine = new Engine(gl, {showFps: true});
+var engine = new Engine(gl, {showFps: true, clearColor: [0.0, 0.0, 0.0, 0.0]});
 var scene = new Scene();
-
 const req = new Request('http://localhost:1234/assets/windmill.obj');
 const reqMtl = new Request('http://localhost:1234/assets/windmill.mtl');
 
@@ -52,12 +50,17 @@ Promise.all([req.send(), reqMtl.send()]).then( res => {
   const loader = new ObjLoader();
   let m = loader.parse(obj);
   console.log(m);
-  let o = new SceneObject(null, 'test load');
+  let o = new SceneObject(null, 'holder');
+  scene.addObject(o);
   const mtl = loader.parseMTL(mat);
   console.log(mtl);
+  o.onUpdate = () => {
+     o.transform.rotation[1] += 25 * engine.time.deltaTime; 
+     //o.transform.rotation[0] += 5 * engine.time.deltaTime; 
+  }
 
   m.geometries.forEach( g => {
-    let oo = new SceneObject(null, 'test load');
+    let oo = new SceneObject(null, 'sub');
     
     let verts = [];
     let verts_n = [];
@@ -79,21 +82,31 @@ Promise.all([req.send(), reqMtl.send()]).then( res => {
       }
     }
 
-    if (data.texcoord && data.normal) {
-      tangents = generateTangents(verts, text_coords); 
+    let ooMat = mtl[g.material]
+    if (data.texcoord && data.normal && ooMat['normalMap']) {
+      let tangents_ = generateTangents(verts, text_coords);
+      tangents = [];
+      for(let i = 0; i<tangents_.length-2; i+=3){
+        tangents.push(vec3(tangents_[i], tangents_[i+1], tangents_[i+2]));
+      }
     }
-    
-    let ooMesh = new Mesh(gl, verts, null, null, null, null, text_coords, verts_n, colors);
+
+    let ooMesh = new Mesh(gl, verts, null, null, null, null, text_coords, verts_n, tangents);
     oo.addMesh(ooMesh);
     oo.parent = o;
     scene.addObject(oo);
-    let ooMat = mtl[g.material]
+    
     if(ooMat['diffuseMap']){
       let diffuseMap = new Texture(0, null, 'assets/'+ooMat['diffuseMap'], gl.RGB, gl.RGB, {flipY: true});
       diffuseMap.LoadTexture(gl);
       ooMesh.textures.DIFFUSE_MAP = diffuseMap;
     }
-
+    if(ooMat['normalMap']){
+      console.log('NORMAL MAP ' + ooMat['normalMap'])
+      let normalMap = new Texture(2, null, 'assets/'+ooMat['normalMap'], gl.RGB, gl.RGB, {flipY: true});
+      normalMap.LoadTexture(gl);
+      ooMesh.textures.NORMAL_MAP = normalMap;
+    }
     if(ooMat['specularMap']){
       let specularMap = new Texture(1, null, 'assets/'+ooMat['specularMap'], gl.RGB, gl.RGB, {flipY: true});
       specularMap.LoadTexture(gl);
@@ -103,224 +116,12 @@ Promise.all([req.send(), reqMtl.send()]).then( res => {
   });
 
 
-  o.transform.position = [-2,3,0];
-  //o.transform.scale = [.5,.5,.5]
+  o.transform.position = [0, 0, -3];
+  o.transform.rotation = [0, -90, 0];
+  o.transform.scale = [.1,.1,.1]
   scene.addObject(o);
-  //initMeshBuffers(gl, m);
+});
 
-
-})
-
-
-
-let vertices = [
-  vec4(-0.5, -0.5, 0.5, 1.0), //l b 0 0
-  vec4(-0.5, 0.5, 0.5, 1.0), //l t  0 1
-  vec4(0.5, -0.5, 0.5, 1.0), //r b 1 0
-  vec4(0.5, 0.5, 0.5, 1.0), //r t 1 1
-
-  vec4(-0.5, -0.5, -0.5, 1.0), //4 l b 
-  vec4(-0.5, 0.5, -0.5, 1.0), //5 l t
-  vec4(0.5, -0.5, -0.5, 1.0), //6 r b
-  vec4(0.5, 0.5, -0.5, 1.0) //7 r t
-];
-
-let vertices1 = [
-  vec4(-0.5, -0.5, -0.5, 1.0),
-  vec4(0.5, -0.5, -0.5, 1.0),
-  vec4(0.5, 0.5, -0.5, 1.0),
-  vec4(0.5, 0.5, -0.5, 1.0),
-  vec4(-0.5, 0.5, -0.5, 1.0),
-  vec4(-0.5, -0.5, -0.5, 1.0),
-
-  vec4(-0.5, -0.5, 0.5, 1.0),
-  vec4(0.5, -0.5, 0.5, 1.0),
-  vec4(0.5, 0.5, 0.5, 1.0),
-  vec4(0.5, 0.5, 0.5, 1.0),
-  vec4(-0.5, 0.5, 0.5, 1.0),
-  vec4(-0.5, -0.5, 0.5, 1.0),
-
-  vec4(-0.5, 0.5, 0.5, 1.0),
-  vec4(-0.5, 0.5, -0.5, 1.0),
-  vec4(-0.5, -0.5, -0.5, 1.0),
-  vec4(-0.5, -0.5, -0.5, 1.0),
-  vec4(-0.5, -0.5, 0.5, 1.0),
-  vec4(-0.5, 0.5, 0.5, 1.0),
-
-  vec4(0.5, 0.5, 0.5, 1.0),
-  vec4(0.5, 0.5, -0.5, 1.0),
-  vec4(0.5, -0.5, -0.5, 1.0),
-  vec4(0.5, -0.5, -0.5, 1.0),
-  vec4(0.5, -0.5, 0.5, 1.0),
-  vec4(0.5, 0.5, 0.5, 1.0),
-
-  vec4(-0.5, -0.5, -0.5, 1.0),
-  vec4(0.5, -0.5, -0.5, 1.0),
-  vec4(0.5, -0.5, 0.5, 1.0),
-  vec4(0.5, -0.5, 0.5, 1.0),
-  vec4(-0.5, -0.5, 0.5, 1.0),
-  vec4(-0.5, -0.5, -0.5, 1.0),
-
-  vec4(-0.5, 0.5, -0.5, 1.0),
-  vec4(0.5, 0.5, -0.5, 1.0),
-  vec4(0.5, 0.5, 0.5, 1.0),
-  vec4(0.5, 0.5, 0.5, 1.0),
-  vec4(-0.5, 0.5, 0.5, 1.0),
-  vec4(-0.5, 0.5, -0.5, 1.0)
-];
-
-var normals = [
-  vec3(0.0, 0.0, -1.0),
-  vec3(0.0, 0.0, -1.0),
-  vec3(0.0, 0.0, -1.0),
-  vec3(0.0, 0.0, -1.0),
-  vec3(0.0, 0.0, -1.0),
-  vec3(0.0, 0.0, -1.0),
-
-  vec3(0.0, 0.0, 1.0),
-  vec3(0.0, 0.0, 1.0),
-  vec3(0.0, 0.0, 1.0),
-  vec3(0.0, 0.0, 1.0),
-  vec3(0.0, 0.0, 1.0),
-  vec3(0.0, 0.0, 1.0),
-
-  vec3(-1.0, 0.0, 0.0),
-  vec3(-1.0, 0.0, 0.0),
-  vec3(-1.0, 0.0, 0.0),
-  vec3(-1.0, 0.0, 0.0),
-  vec3(-1.0, 0.0, 0.0),
-  vec3(-1.0, 0.0, 0.0),
-
-  vec3(1.0, 0.0, 0.0),
-  vec3(1.0, 0.0, 0.0),
-  vec3(1.0, 0.0, 0.0),
-  vec3(1.0, 0.0, 0.0),
-  vec3(1.0, 0.0, 0.0),
-  vec3(1.0, 0.0, 0.0),
-
-  vec3(0.0, -1.0, 0.0),
-  vec3(0.0, -1.0, 0.0),
-  vec3(0.0, -1.0, 0.0),
-  vec3(0.0, -1.0, 0.0),
-  vec3(0.0, -1.0, 0.0),
-  vec3(0.0, -1.0, 0.0),
-
-  vec3(0.0, 1.0, 0.0),
-  vec3(0.0, 1.0, 0.0),
-  vec3(0.0, 1.0, 0.0),
-  vec3(0.0, 1.0, 0.0),
-  vec3(0.0, 1.0, 0.0),
-  vec3(0.0, 1.0, 0.0)
-]
-
-var normals1 = [
-  vec3(0.0, 0.0, 1.0),
-  vec3(0.0, 0.0, 1.0),
-  vec3(0.0, 0.0, 1.0),
-  vec3(0.0, 0.0, 1.0),
-  vec3(0.0, 0.0, 1.0),
-  vec3(0.0, 0.0, 1.0),
-
-  vec3(0.0, 0.0, -1.0),
-  vec3(0.0, 0.0, -1.0),
-  vec3(0.0, 0.0, -1.0),
-  vec3(0.0, 0.0, -1.0),
-  vec3(0.0, 0.0, -1.0),
-  vec3(0.0, 0.0, -1.0),
-
-  vec3(-1.0, 0.0, 0.0),
-  vec3(-1.0, 0.0, 0.0),
-  vec3(-1.0, 0.0, 0.0),
-  vec3(-1.0, 0.0, 0.0),
-  vec3(-1.0, 0.0, 0.0),
-  vec3(-1.0, 0.0, 0.0),
-
-  vec3(1.0, 0.0, 0.0),
-  vec3(1.0, 0.0, 0.0),
-  vec3(1.0, 0.0, 0.0),
-  vec3(1.0, 0.0, 0.0),
-  vec3(1.0, 0.0, 0.0),
-  vec3(1.0, 0.0, 0.0),
-
-  vec3(0.0, 1.0, 0.0),
-  vec3(0.0, 1.0, 0.0),
-  vec3(0.0, 1.0, 0.0),
-  vec3(0.0, 1.0, 0.0),
-  vec3(0.0, 1.0, 0.0),
-  vec3(0.0, 1.0, 0.0),
-
-  vec3(0.0, -1.0, 0.0),
-  vec3(0.0, -1.0, 0.0),
-  vec3(0.0, -1.0, 0.0),
-  vec3(0.0, -1.0, 0.0),
-  vec3(0.0, -1.0, 0.0),
-  vec3(0.0, -1.0, 0.0)
-]
-
-var floorTextCoords = [
-  vec2(0, 0),
-  vec2(1, 0),
-  vec2(1,1),//
-  vec2(1, 1),
-  vec2(0, 1),
-  vec2(0, 0),//
-
-  vec2(0, 0),
-  vec2(1, 0),
-  vec2(1, 1),//
-  vec2(1, 1),
-  vec2(0, 1),
-  vec2(0, 0),//
-
-  vec2(0, 0),
-  vec2(1, 0),
-  vec2(1, 1),//
-  vec2(1, 1),
-  vec2(0, 1),
-  vec2(0, 0),//
-
-  vec2(0, 0),
-  vec2(1, 0),
-  vec2(1, 1),//
-  vec2(1, 1),
-  vec2(0, 1),
-  vec2(0, 0),//
-
-  vec2(0, 0),
-  vec2(1, 0),
-  vec2(1, 1),//
-  vec2(1, 1),
-  vec2(0, 1),
-  vec2(0, 0),//
-  
-  vec2(0, 0),
-  vec2(1, 0),
-  vec2(1, 1),//
-  vec2(1, 1),
-  vec2(0, 1),
-  vec2(0, 0),//
-];
-
-let indices = [
-  //front
-  0,  2,  1,
-  2,  3,  1,  
-  //back
-  4,  5,  6,
-  6,  5,  7,
-  //left
-  0,  1,  4,
-  4,  1,  5,
-    //right
-  2,  6,  3,  
-  6,  7,  3,
-  //top
-  3,  7,  1,
-  7,  5,  1,
-  //bottom
-  2,  0,  6,
-  6,  0,  4
-];
 
 function handleInputs() {
   if (
@@ -373,101 +174,130 @@ function handleInputs() {
     inputs.getMouseMovY(),
     engine.time.deltaTime
   );
+
 }
 
-var obj = new SceneObject(null, 'obj');
-var obj2 = new SceneObject(null, 'obj2');
-var obj3 = new SceneObject(null, 'obj3');
-var lightsObj = new SceneObject(null, 'lights');
-var robotBody = new SceneObject(null, 'robotBody');
-var robotUpperArm = new SceneObject(null, 'robotUpperArm');
-var robotLowerArm = new SceneObject(null, 'robotLowerArm');
 
-var mat = new Material(vec3(0.0, 0.0,0.1), vec3(0.1, 0.0, 0.7));
-mat.shininess = 256;
-obj.material = mat;
-obj2.material = mat;
-obj3.material = mat;
+let vertices1 = [
+  vec4(-0.5, -0.5, -0.5, 1.0),
+  vec4(0.5, -0.5, -0.5, 1.0),
+  vec4(0.5, 0.5, -0.5, 1.0),
+  vec4(0.5, 0.5, -0.5, 1.0),
+  vec4(-0.5, 0.5, -0.5, 1.0),
+  vec4(-0.5, -0.5, -0.5, 1.0),
 
-robotBody.material = new Material(vec3(0.2, 0.0,0.0), vec3(0.9, 0.1, 0.2));
-robotUpperArm.material = mat;
-robotLowerArm.material = mat;
+  vec4(-0.5, -0.5, 0.5, 1.0),
+  vec4(0.5, -0.5, 0.5, 1.0),
+  vec4(0.5, 0.5, 0.5, 1.0),
+  vec4(0.5, 0.5, 0.5, 1.0),
+  vec4(-0.5, 0.5, 0.5, 1.0),
+  vec4(-0.5, -0.5, 0.5, 1.0),
 
-var floor = new SceneObject(null, 'floor');
-floor.material = new Material(vec3(0.2, 0.0,0.0), vec3(0.9, 0.1, 0.2));
-floor.transform.position = [0, -0.75, 0];
-floor.transform.scale = [5, 0.5, 5];
-let floorMesh = new Mesh(gl, vertices1, null, null, null, null,  floorTextCoords, normals);
-var textureFloor = new Texture(0, null, 'assets/download.jpg', gl.RGB, gl.RGB);
-textureFloor.LoadTexture(gl);
-floorMesh.textures.DIFFUSE_MAP = textureFloor;
-floor.addMesh(floorMesh);
+  vec4(-0.5, 0.5, 0.5, 1.0),
+  vec4(-0.5, 0.5, -0.5, 1.0),
+  vec4(-0.5, -0.5, -0.5, 1.0),
+  vec4(-0.5, -0.5, -0.5, 1.0),
+  vec4(-0.5, -0.5, 0.5, 1.0),
+  vec4(-0.5, 0.5, 0.5, 1.0),
 
-scene.addObject(floor);
-scene.addObject(obj);
-scene.addObject(obj2);
-scene.addObject(obj3);
-scene.addObject(robotBody);
-scene.addObject(robotUpperArm);
-scene.addObject(robotLowerArm);
-scene.addObject(lightsObj);
+  vec4(0.5, 0.5, 0.5, 1.0),
+  vec4(0.5, 0.5, -0.5, 1.0),
+  vec4(0.5, -0.5, -0.5, 1.0),
+  vec4(0.5, -0.5, -0.5, 1.0),
+  vec4(0.5, -0.5, 0.5, 1.0),
+  vec4(0.5, 0.5, 0.5, 1.0),
 
+  vec4(-0.5, -0.5, -0.5, 1.0),
+  vec4(0.5, -0.5, -0.5, 1.0),
+  vec4(0.5, -0.5, 0.5, 1.0),
+  vec4(0.5, -0.5, 0.5, 1.0),
+  vec4(-0.5, -0.5, 0.5, 1.0),
+  vec4(-0.5, -0.5, -0.5, 1.0),
+
+  vec4(-0.5, 0.5, -0.5, 1.0),
+  vec4(0.5, 0.5, -0.5, 1.0),
+  vec4(0.5, 0.5, 0.5, 1.0),
+  vec4(0.5, 0.5, 0.5, 1.0),
+  vec4(-0.5, 0.5, 0.5, 1.0),
+  vec4(-0.5, 0.5, -0.5, 1.0)
+];
+var normals = [
+  vec3(0.0, 0.0, -1.0),
+  vec3(0.0, 0.0, -1.0),
+  vec3(0.0, 0.0, -1.0),
+  vec3(0.0, 0.0, -1.0),
+  vec3(0.0, 0.0, -1.0),
+  vec3(0.0, 0.0, -1.0),
+
+  vec3(0.0, 0.0, 1.0),
+  vec3(0.0, 0.0, 1.0),
+  vec3(0.0, 0.0, 1.0),
+  vec3(0.0, 0.0, 1.0),
+  vec3(0.0, 0.0, 1.0),
+  vec3(0.0, 0.0, 1.0),
+
+  vec3(-1.0, 0.0, 0.0),
+  vec3(-1.0, 0.0, 0.0),
+  vec3(-1.0, 0.0, 0.0),
+  vec3(-1.0, 0.0, 0.0),
+  vec3(-1.0, 0.0, 0.0),
+  vec3(-1.0, 0.0, 0.0),
+
+  vec3(1.0, 0.0, 0.0),
+  vec3(1.0, 0.0, 0.0),
+  vec3(1.0, 0.0, 0.0),
+  vec3(1.0, 0.0, 0.0),
+  vec3(1.0, 0.0, 0.0),
+  vec3(1.0, 0.0, 0.0),
+
+  vec3(0.0, -1.0, 0.0),
+  vec3(0.0, -1.0, 0.0),
+  vec3(0.0, -1.0, 0.0),
+  vec3(0.0, -1.0, 0.0),
+  vec3(0.0, -1.0, 0.0),
+  vec3(0.0, -1.0, 0.0),
+
+  vec3(0.0, 1.0, 0.0),
+  vec3(0.0, 1.0, 0.0),
+  vec3(0.0, 1.0, 0.0),
+  vec3(0.0, 1.0, 0.0),
+  vec3(0.0, 1.0, 0.0),
+  vec3(0.0, 1.0, 0.0)
+]
 let cube = new Mesh(gl, vertices1, null, null, null, null, null, normals);
-let cube2 = new Mesh(gl, vertices1, null, null, null, null, null, normals);
-let cube3 = new Mesh(gl, vertices1, null, null, null, null, null, normals);
+var lightsObj = new SceneObject(null, 'lights');
 
-obj.addMesh(cube);
-obj.transform.rotation = [0, 0, 0];
-
-obj2.addMesh(cube2);
-obj2.transform.position = [2, 0, 0];
-obj2.transform.rotation = [0, 50, 0];
-obj3.addMesh(cube3);
-
-obj2.addChild(obj3);
-obj3.transform.position = [-1, 0, -3];
-obj3.transform.scale = [1, 1, 2];
-//obj.addMesh(cube3);
-
-robotBody.addMesh(cube3);
-robotBody.addChild(robotLowerArm);
-robotBody.transform.position = [1, 2, 0];
-robotBody.transform.rotation = [0, 30, 0];
-robotLowerArm.addMesh(cube3);
-robotLowerArm.addChild(robotUpperArm);
-robotLowerArm.transform.position = [0, 1, 0];
-robotLowerArm.transform.scale = [0.5, 1, 0.5];
-robotLowerArm.transform.rotation = [0, 30, 0];
-robotUpperArm.addMesh(cube3);
-robotUpperArm.transform.position = [0, 1, 0];
-robotUpperArm.transform.scale = [0.3, 1, 0.3];
+scene.addObject(lightsObj);
 
 let dirLight = new DirectionalLight();
 dirLight.ambient = vec3(0.1, 0.1, 0.1);
 dirLight.diffuse = vec3(1.0, 1.0, 1.0);
-dirLight.direction = vec3(0.3, -1.0, 0.1);
+dirLight.direction = vec3(-1, -1, 5);
+dirLight.specular = vec3(1, 1, 1);
 
 var pointLight_obj = new SceneObject(null, 'dirLight');
-pointLight_obj.material = new Material(vec3(1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0));
-scene.addObject(pointLight_obj);
 pointLight_obj.addMesh(cube);
-pointLight_obj.transform.position = [0.0, 6, -7.0];
-pointLight_obj.transform.scale = [.2, .2, .2];
+pointLight_obj.material = new Material(vec3(0.0, 1.0, 0.0), vec3(0.0, 1.0, 0.0));
+scene.addObject(pointLight_obj);
+
+pointLight_obj.transform.position = [0.0, 0, -2.0];
+pointLight_obj.transform.scale = [.1, .1, .1];
 
 let pointLight = new PointLight();
-pointLight.position = vec3(0.0, 4, -7.0);
+pointLight.position = vec3(0.0, 0, -2.0);
 pointLight.diffuse = vec3(1.0, 1.0, 1.0);
 
-var pointLight_obj2 = new SceneObject(null, 'dirLight');
+/* var pointLight_obj2 = new SceneObject(null, 'dirLight');
+pointLight_obj2.addMesh(cube);
 pointLight_obj2.material = new Material(vec3(1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0));
 scene.addObject(pointLight_obj2);
-pointLight_obj2.addMesh(cube);
+
 pointLight_obj2.transform.position = [0.0, -3.0, 0.0];
 pointLight_obj2.transform.scale = [.2, .2, .2];
 
 let pointLight2 = new PointLight();
 pointLight2.position = vec3(0.0, -3.0, 0.0);
-pointLight2.diffuse = vec3(1.0, 1.0, 1.0);
+pointLight2.diffuse = vec3(1.0, 1.0, 1.0); */
 
 let spotLight = new SpotLight();
 spotLight.direction = vec3(0, 1.0, 0.0);
@@ -476,15 +306,14 @@ spotLight.cutOff = 0.011;
 spotLight.outerCutOff = 0.512;
 spotLight.ambient = vec3(1.0, 0.1, 0.1);
 lightsObj.addComponent(dirLight);
-lightsObj.addComponent(pointLight);
-lightsObj.addComponent(pointLight2);
-//obj3.addComponent(spotLight);
+/* lightsObj.addComponent(pointLight); */
+/* lightsObj.addComponent(pointLight2); */
+
 var gameManager = new SceneObject(null, 'gm');
 console.log(engine);
 gameManager.onUpdate =  function(){
   handleInputs();
   inputs.clearMousePosition();
-  //obj.transform.rotation[1] += 0.1;
 }
 scene.addObject(gameManager);
 scene.addCamera(camera);

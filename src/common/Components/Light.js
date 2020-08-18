@@ -12,9 +12,9 @@ const lightTypes = LightTypes;
 export class Light extends Component{
     static nextId = 1;
     id;
-    diffuse = vec3(0.5,0.5,0.5);
+    diffuse = vec3(1.0, 1.0, 1.0);
     ambient = vec3(0.1, 0.1, 0.1);
-    specular = vec3(0.8, 0.8, 0.8);
+    specular = vec3(1.0, 1.0, 1.0);
     /**
      * 
      * @param {vec3} diffuse Diffuse component of the light

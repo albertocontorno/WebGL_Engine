@@ -34,6 +34,24 @@ export class ShaderFactory{
                 vertexSource.textureCoordsIn = shaderDefault.vTextureCoords_In;
                 vertexSource.textureCoordsOut = shaderDefault.vTextureCoords_Out;
                 vertexSource.textureCoordsAssign = shaderDefault.vTextureCoords_Assign;
+
+                if(textures[TextureTypes.NormalMap]){
+                    vertexSource.tangentIn = shaderDefault.vTangent_In;
+                    vertexSource.tangentOut = shaderDefault.vTangent_Out;
+                    vertexSource.tangentAssign = shaderDefault.vTangent_Assign;
+                    /* vertexSource.tbnOut = shaderDefault.vTbn_Out;
+                    vertexSource.tbnCalc = shaderDefault.vTangentCalc;
+                    vertexSource.tbnAssign = shaderDefault.vTbn_Assing; */
+                    vertexSource.mainBodyFPos = shaderDefault.vMainBody_fPos_Calc; //TODO CHANGE
+                    /* if(props.lights){
+                        const tangentVertexLightsVars = this.getLightsPosForTangentSpace(props.lights.lights); 
+                        vertexSource.lightsPosUniform = tangentVertexLightsVars.inUniforms;
+                        vertexSource.lightsPosOut = tangentVertexLightsVars.outPos;
+                        vertexSource.tangentCalc += tangentVertexLightsVars.tangentLightsCalc;
+                    } */
+                } else {
+                    vertexSource.mainBodyFPos = shaderDefault.vMainBody_fPos_Calc;
+                }
             }
         }
 
@@ -53,7 +71,6 @@ export class ShaderFactory{
     static CreateFragmentShaderFromProperties(props, n) {
         let fragmentSource = shaderDefault.fragmentShaderCompleteObj();
         let hasLights = false;
-        let hasTexture ={  hasDiffuseTexture: false };
 
         if(props.material){
             if(props.material.vertexColoring){
@@ -62,30 +79,29 @@ export class ShaderFactory{
 
             fragmentSource.materialStruct = shaderDefault.materialStruct;
             fragmentSource.material = shaderDefault.materialVar;
-            const textures = props.material.textures
+            const textures = props.material.textures;
             if(textures){
                 fragmentSource.texturesCoords = shaderDefault.fTextureCoords;
                 if(textures[TextureTypes.DiffuseMap]){
                     
                     fragmentSource.samplers += shaderDefault.diffuseMapVar;
-                    //fragmentSource.texturesCoords += shaderDefault.fDiffuseCoords;
-                    hasTexture.hasDiffuseTexture = true;
                 } 
                 if(textures[TextureTypes.SpecularMap]){
                     fragmentSource.samplers += shaderDefault.specularMapVar;
-                    //fragmentSource.texturesCoords += shaderDefault.fSpecularCoords;
                 } 
                 if(textures[TextureTypes.LightMap]){
                     fragmentSource.samplers += shaderDefault.lightMapVar;
-                    //fragmentSource.texturesCoords += shaderDefault.fLightCoords;
                 } 
                 if(textures[TextureTypes.BumpMap]){
                     fragmentSource.samplers += shaderDefault.bumbMapVar;
-                    //fragmentSource.texturesCoords += shaderDefault.fBumpCoords;
+                } 
+                if(textures[TextureTypes.NormalMap]){
+                    fragmentSource.samplers += shaderDefault.normalMapVar;
+                    //fragmentSource.tbnIn = shaderDefault.fTBN_In;
+                    fragmentSource.tangentIn = shaderDefault.fTangent_In;
                 } 
                 if(textures[TextureTypes.ShadowMap]){
                     fragmentSource.samplers += shaderDefault.shadowMapVar;
-                    //fragmentSource.texturesCoords += shaderDefault.fShadowCoords;
                 }
                 fragmentSource.textureCalc = this.getTexturesCalc(props.material.textures);
             }
@@ -120,10 +136,19 @@ export class ShaderFactory{
         return lights;
     }
 
-    static doLightCalcs(lights, textureTypes) {
-        let lightsCalc =
-            '\tvec3 viewDir = normalize(viewPos - fPos);\n' +
-            '\tvec3 norm = normalize(fNormal);\n'// se c'è normal map usare quella
+    static doLightCalcs(lights, textures) {
+        
+        let lightsCalc  = '';
+        if(textures[TextureTypes.NormalMap]){
+            lightsCalc =
+                '\tvec3 viewDir = normalize(viewPos - fPos);\n' /* +
+                shaderDefault.fNormalCalc_noTangents; */
+                + shaderDefault.fTbn_Calc;
+        } else {
+            lightsCalc =
+                '\tvec3 viewDir = normalize(viewPos - fPos);\n' +
+                '\tvec3 norm = normalize(fNormal);\n'
+        }
 
         for(let i=0; i<lights.length; i++){
             if( i == 0){
@@ -213,6 +238,21 @@ export class ShaderFactory{
         }
 
         return r;
+    }
+
+    static getLightsPosForTangentSpace(lights){
+        let inUniforms = '';
+        let outPos = '';
+
+        for(let i=0; i<lights.length; i++){
+            let lightType = lights[i].type
+            if (lightType === LightTypes.PointLight || lightType === LightTypes.SpotLight) {
+                inUniforms += 'uniform vec3 vLightPos' + i + ';\n';
+                outPos += 'out vec3 fLightPos' + i + ';\n';
+            };
+        }
+
+        return {inUniforms, outPos, tangentLightsCalc};
     }
 
     //FOR FUTURE

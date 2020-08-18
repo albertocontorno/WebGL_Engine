@@ -1,3 +1,5 @@
+export const vMainBody_fPos_Calc = '\tfPos = vec3(model * vPosition);\n';
+export const vMainBody_fPos_Calc_TBN = '\tfPos = vec3(model * vPosition) * TBN;\n';
 export const vColor_In = 'in vec4 vColor;\n';
 export const vColor_Out = 'out vec4 fColor;\n';
 export const vColor_Assign = 'fColor = vColor;\n';
@@ -6,41 +8,52 @@ export const vTextureCoords_In = 'in vec2 vTextureCoords;\n';
 export const vTextureCoords_Out = 'out vec2 fTextureCoords;\n';
 export const vTextureCoords_Assign = '\tfTextureCoords = vTextureCoords;\n';
 
+export const vTangent_In = 'in vec3 vTangent;\n';
+export const vTangent_Out = 'out vec3 fTangent;\n';
+export const vTangent_Assign = '\tfTangent = normalize(normalMatrix * vTangent);\n';
+export const vTangentCalc = `
+    vec3 T = normalize(normalMatrix * vTangent);
+    vec3 N = normalize(fNormal);
+    T = normalize(T - dot(T, N) * N);
+    vec3 B = cross(N, T);
+    mat3 TBN = mat3(T, B, N);\n`;
+export const vTbn_Out = 'out mat3 fTBN;\n';
+export const vTbn_Assing = '\tfTBN = TBN;\n';
+
 export const vertexCompleteShaderObj = () =>({
-  version: "#version 300 es\n",
-  position: "in vec4 vPosition;\n",
+  version: '#version 300 es\n',
+  position: 'in vec4 vPosition;\n',
+  lightsPosUniform: '',
+  lightsPosOut: '',
   colorIn: '',
   textureCoordsIn: '',
-  diffuseCoordsIn: '',
   textureCoordsOut: '',
-  diffuseCoordsOut: '',
-  specularCoordsIn: '',
-  specularCoordsOut: '',
-  normalCoordsIn: '',
-  normalCoordsOut: '',
-  normalIn: "in vec3 vNormal;\n",
-  modelViewProj: "uniform mat4 model;\nuniform mat4 view;\nuniform mat4 projection;\n",
+  normalIn: 'in vec3 vNormal;\n',
+  tangentIn: '',
+  tangentOut: '',
+  modelViewProj: 'uniform mat4 model;\nuniform mat4 view;\nuniform mat4 projection;\n',
   colorOut: '',
-  normalOut: "out vec3 fNormal;\n",
-  fragPosOut: "out vec3 fPos;\n",
-  mainStart: "void main(){\n",
-  mainBody: "\tfNormal = mat3(transpose(inverse(model))) * vNormal;\n"+
-  "\tfPos = vec3(model * vPosition);\n",
+  normalOut: 'out vec3 fNormal;\n',
+  tbnOut: '',
+  fragPosOut: 'out vec3 fPos;\n',
+  mainStart: 'void main(){\n',
+  mainBodyNormalCalc: '\tmat3 normalMatrix = mat3(transpose(inverse(model)));\n\tfNormal = normalMatrix * vNormal;\n',
   textureCoordsAssign: '',
-  diffuseAssign: '',
-  specularAssign: '',
-  normalAssign: '',
+  tangentAssign: '',
+  tbnCalc: '',
+  tbnAssign: '',
+  mainBodyFPos: '',
   colorAssign: '',
-  mainBodyOutput: '\tgl_Position = projection * view * model * vPosition;\n}'
+  mainBodyOutput: '\n\tgl_Position = projection * view * model * vPosition;\n}'
 });
 
 
-export const materialStruct = "struct Material {\n" +
-"\tvec3 ambient;\n" +
-"\tvec3 diffuse;\n" +
-"\tvec3 specular;\n" +
-"\tfloat shininess;\n" +
-"};\n"
+export const materialStruct = 'struct Material {\n' +
+'\tvec3 ambient;\n' +
+'\tvec3 diffuse;\n' +
+'\tvec3 specular;\n' +
+'\tfloat shininess;\n' +
+'};\n'
 
 export const DirectionalLightShader = `struct DirectionalLight {
     vec3 direction;
@@ -61,10 +74,34 @@ export const PointLightShader = `struct PointLight {
 };
 `;
 
+export const PointLightShader_NoPos = `struct PointLight {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float constant;
+    float linear;
+    float quadratic;
+};
+`;
+
 export const SpotLightShader = `
 struct SpotLight {
     vec3 direction;
     vec3 position;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float constant;
+    float linear;
+    float quadratic;
+    float cutOff;
+    float outerCutOff;
+};
+`;
+
+export const SpotLightShader_NoPos = `
+struct SpotLight {
+    vec3 direction;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -167,8 +204,24 @@ export const normalMapVar = 'uniform sampler2D normalTexture;\n';
 export const fTextureCoords = 'in vec2 fTextureCoords;\n';
 export const fDiffuseCoords = 'in vec2 fDiffuseTextCoords;\n';
 
-export const fOutput_Lights = '\tfragColor = vec4(lightColor, 1.0);\n'
-export const fOutput_Lights_Color = '\tfragColor = vec4(lightColor, 1.0) * fColor;\n'
+export const fOutput_Lights = '\tfragColor = vec4(lightColor, 1.0);\n';
+export const fOutput_Lights_Color = '\tfragColor = vec4(lightColor, 1.0) * fColor;\n';
+
+export const fNormalCalc_noTangents = `\tvec3 norm = texture(normalTexture, fTextureCoords).rgb;
+\tnorm = normalize(norm * 2.0 - 1.0);\n`;
+export const fNormalCalc_Tangents = `vec3 norm = texture(normalTexture, fTextureCoords).rgb;
+norm = norm * 2.0 - 1.0;   
+norm = normalize(fTBN * norm);`;
+export const fTBN_In = 'in mat3 fTBN;\n';
+
+export const fTangent_In = 'in vec3 fTangent;\n';
+export const fTbn_Calc = `\tvec3 norm = normalize(fNormal) * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+\tvec3 tangent = normalize(fTangent) * ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+\tvec3 bitangent = normalize(cross(norm, tangent));
+\tmat3 tbn = mat3(tangent, bitangent, norm);
+\tnorm = texture(normalTexture, fTextureCoords).rgb * 2. - 1.;
+\tnorm = normalize(tbn * norm);\n`;
+
 
 export var fragmentShaderCompleteObj = ()=>({
   version: '#version 300 es\n',
@@ -178,6 +231,8 @@ export var fragmentShaderCompleteObj = ()=>({
   lightsFuncDec: '',
   colorIn: '',
   normalIn: 'in vec3 fNormal;\n',
+  tangentIn: '',
+  tbnIn: '',
   fragPosIn: 'in vec3 fPos;\n',
   texturesCoords: '',
   samplers: '',
@@ -186,6 +241,7 @@ export var fragmentShaderCompleteObj = ()=>({
   lightsUniform: '',
   colorOut: 'out vec4 fragColor;\n',
   mainStart: 'void main(){\n',
+  normalCalc: '',
   lightsCalc: '',
   textureCalc: '',
   fragOutput: '\tfragColor = vec4(0.0, 0.0, 1.0, 1.0);\n',

@@ -1,0 +1,15 @@
+# Blender MTL File: 'None'
+# Material Count: 2
+
+newmtl initialShadingGroup
+Ns 350
+Ka 1.000000 1.000000 1.000000
+Kd 1.00000 1.00000 1.00000
+Ks 1.00000 0.500000 1.00000
+Ke 0.0 0.0 0.0
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd initialShadingGroup_Diffuse.tga.png
+map_Bump initialShadingGroup_Normal.tga.png
+map_Ns initialShadingGroup_Specular.tga.png
