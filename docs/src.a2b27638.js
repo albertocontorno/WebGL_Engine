@@ -359,7 +359,66 @@ window.requestAnimFrame = function () {
     window.setTimeout(callback, 1000 / 60);
   };
 }();
-},{}],"node_modules/@babel/runtime/helpers/classCallCheck.js":[function(require,module,exports) {
+},{}],"node_modules/@babel/runtime/helpers/arrayLikeToArray.js":[function(require,module,exports) {
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) {
+    arr2[i] = arr[i];
+  }
+
+  return arr2;
+}
+
+module.exports = _arrayLikeToArray;
+},{}],"node_modules/@babel/runtime/helpers/arrayWithoutHoles.js":[function(require,module,exports) {
+var arrayLikeToArray = require("./arrayLikeToArray");
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) return arrayLikeToArray(arr);
+}
+
+module.exports = _arrayWithoutHoles;
+},{"./arrayLikeToArray":"node_modules/@babel/runtime/helpers/arrayLikeToArray.js"}],"node_modules/@babel/runtime/helpers/iterableToArray.js":[function(require,module,exports) {
+function _iterableToArray(iter) {
+  if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
+}
+
+module.exports = _iterableToArray;
+},{}],"node_modules/@babel/runtime/helpers/unsupportedIterableToArray.js":[function(require,module,exports) {
+var arrayLikeToArray = require("./arrayLikeToArray");
+
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return arrayLikeToArray(o, minLen);
+}
+
+module.exports = _unsupportedIterableToArray;
+},{"./arrayLikeToArray":"node_modules/@babel/runtime/helpers/arrayLikeToArray.js"}],"node_modules/@babel/runtime/helpers/nonIterableSpread.js":[function(require,module,exports) {
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+
+module.exports = _nonIterableSpread;
+},{}],"node_modules/@babel/runtime/helpers/toConsumableArray.js":[function(require,module,exports) {
+var arrayWithoutHoles = require("./arrayWithoutHoles");
+
+var iterableToArray = require("./iterableToArray");
+
+var unsupportedIterableToArray = require("./unsupportedIterableToArray");
+
+var nonIterableSpread = require("./nonIterableSpread");
+
+function _toConsumableArray(arr) {
+  return arrayWithoutHoles(arr) || iterableToArray(arr) || unsupportedIterableToArray(arr) || nonIterableSpread();
+}
+
+module.exports = _toConsumableArray;
+},{"./arrayWithoutHoles":"node_modules/@babel/runtime/helpers/arrayWithoutHoles.js","./iterableToArray":"node_modules/@babel/runtime/helpers/iterableToArray.js","./unsupportedIterableToArray":"node_modules/@babel/runtime/helpers/unsupportedIterableToArray.js","./nonIterableSpread":"node_modules/@babel/runtime/helpers/nonIterableSpread.js"}],"node_modules/@babel/runtime/helpers/classCallCheck.js":[function(require,module,exports) {
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -447,7 +506,9 @@ var ShaderUtils = /*#__PURE__*/function () {
   }, {
     key: "loadAndCompileShader",
     value: function loadAndCompileShader(type, source) {
-      console.log('[SHADER] Compiling ->', ' Type: ', type, '- Source: ', source);
+      console.log('[SHADER] Compiling ->', ' Type: ', type, '- Source: '
+      /* , source */
+      );
       var shader = this.gl.createShader(type);
       this.gl.shaderSource(shader, source);
       this.gl.compileShader(shader);
@@ -617,6 +678,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Engine = void 0;
 
+var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
+
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
@@ -644,7 +707,10 @@ var Engine = /*#__PURE__*/function () {
    * @param {WebGL_Context} gl The WebGl context obtained from a canvas. This will be the context of the entire Engine.
    * used as the context of every Shader.
    */
-  function Engine(gl, opt) {
+  function Engine(gl) {
+    var opt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+      clearColor: [0.0, 0.0, 0.0, 1.0]
+    };
     (0, _classCallCheck2.default)(this, Engine);
     (0, _defineProperty2.default)(this, "scenes", []);
     (0, _defineProperty2.default)(this, "activeScene", void 0);
@@ -670,6 +736,10 @@ var Engine = /*#__PURE__*/function () {
     if (this.opt) {
       if (this.opt.showFps) {
         this.setFpsCounter();
+      }
+
+      if (!this.opt.clearColor) {
+        this.opt.clearColor = [0.0, 0.0, 0.0, 1.0];
       }
     }
   }
@@ -697,7 +767,10 @@ var Engine = /*#__PURE__*/function () {
   }, {
     key: "doRendering",
     value: function doRendering() {
-      this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      var _this$gl;
+
+      (_this$gl = this.gl).clearColor.apply(_this$gl, (0, _toConsumableArray2.default)(this.opt.clearColor));
+
       this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
       if (this.scenes[this.activeScene] && this.scenes[this.activeScene].mainCamera) {
@@ -714,7 +787,7 @@ var Engine = /*#__PURE__*/function () {
 
       var container = document.createElement('div');
       var idNum = Math.round(Math.random(0, 1) * 100);
-      container.setAttribute("style", "position: absolute;\n      top: 10px;\n      left: 20px;\n      color: yellow;");
+      container.setAttribute("style", "position: absolute;\n      top: 10px;\n      left: 20px;\n      color: lime;");
       container.id = 'glFpsCounterContainer_' + idNum;
       var text = document.createElement('p');
       text.id = 'glFpsCounterText_' + idNum;
@@ -729,7 +802,7 @@ var Engine = /*#__PURE__*/function () {
 }();
 
 exports.Engine = Engine;
-},{"@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js","@babel/runtime/helpers/defineProperty":"node_modules/@babel/runtime/helpers/defineProperty.js","./shadersUtils":"src/common/shadersUtils.js","./Time":"src/common/Time.js"}],"src/common/keyCodes.js":[function(require,module,exports) {
+},{"@babel/runtime/helpers/toConsumableArray":"node_modules/@babel/runtime/helpers/toConsumableArray.js","@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js","@babel/runtime/helpers/defineProperty":"node_modules/@babel/runtime/helpers/defineProperty.js","./shadersUtils":"src/common/shadersUtils.js","./Time":"src/common/Time.js"}],"src/common/keyCodes.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2901,7 +2974,62 @@ var Scene = /*#__PURE__*/function () {
 
 exports.Scene = Scene;
 (0, _defineProperty2.default)(Scene, "nextId", 1);
-},{"@babel/runtime/helpers/typeof":"node_modules/@babel/runtime/helpers/typeof.js","@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js","@babel/runtime/helpers/defineProperty":"node_modules/@babel/runtime/helpers/defineProperty.js","./Object":"src/common/Object.js","./Camera":"src/common/Camera.js"}],"src/common/Shader.js":[function(require,module,exports) {
+},{"@babel/runtime/helpers/typeof":"node_modules/@babel/runtime/helpers/typeof.js","@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js","@babel/runtime/helpers/defineProperty":"node_modules/@babel/runtime/helpers/defineProperty.js","./Object":"src/common/Object.js","./Camera":"src/common/Camera.js"}],"node_modules/@babel/runtime/helpers/arrayWithHoles.js":[function(require,module,exports) {
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
+module.exports = _arrayWithHoles;
+},{}],"node_modules/@babel/runtime/helpers/iterableToArrayLimit.js":[function(require,module,exports) {
+function _iterableToArrayLimit(arr, i) {
+  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+  var _e = undefined;
+
+  try {
+    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+      _arr.push(_s.value);
+
+      if (i && _arr.length === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && _i["return"] != null) _i["return"]();
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+
+  return _arr;
+}
+
+module.exports = _iterableToArrayLimit;
+},{}],"node_modules/@babel/runtime/helpers/nonIterableRest.js":[function(require,module,exports) {
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+
+module.exports = _nonIterableRest;
+},{}],"node_modules/@babel/runtime/helpers/slicedToArray.js":[function(require,module,exports) {
+var arrayWithHoles = require("./arrayWithHoles");
+
+var iterableToArrayLimit = require("./iterableToArrayLimit");
+
+var unsupportedIterableToArray = require("./unsupportedIterableToArray");
+
+var nonIterableRest = require("./nonIterableRest");
+
+function _slicedToArray(arr, i) {
+  return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || unsupportedIterableToArray(arr, i) || nonIterableRest();
+}
+
+module.exports = _slicedToArray;
+},{"./arrayWithHoles":"node_modules/@babel/runtime/helpers/arrayWithHoles.js","./iterableToArrayLimit":"node_modules/@babel/runtime/helpers/iterableToArrayLimit.js","./unsupportedIterableToArray":"node_modules/@babel/runtime/helpers/unsupportedIterableToArray.js","./nonIterableRest":"node_modules/@babel/runtime/helpers/nonIterableRest.js"}],"src/common/Shader.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3041,7 +3169,11 @@ exports.DefTextCoords = DefTextCoords;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.fragmentShaderCompleteObj = exports.fOutput_Lights_Color = exports.fOutput_Lights = exports.fDiffuseCoords = exports.fTextureCoords = exports.normalMapVar = exports.shadowMapVar = exports.bumbMapVar = exports.lightMapVar = exports.specularMapVar = exports.diffuseMapVar = exports.fColorIn = exports.materialVar = exports.SpotLightFuncImplObj = exports.PointLightFuncImplObj = exports.DirLightFuncImplObj = exports.LightSpecularWithTexture_Spec = exports.LightDiffuseWithTexture_Spec = exports.LightAmbientWithTexture_Spec = exports.LightSpecularWithTexture_Diff = exports.LightDiffuseWithTexture_Diff = exports.LightAmbientWithTexture_Diff = exports.LightSpecularWithTexture_Diff_Spec = exports.LightDiffuseWithTexture_Diff_Spec = exports.LightAmbientWithTexture_Diff_Spec = exports.SpotLightFuncDec = exports.PointLightFuncDec = exports.DirLightFuncDec = exports.SpotLightShader = exports.PointLightShader = exports.DirectionalLightShader = exports.materialStruct = exports.vertexCompleteShaderObj = exports.vTextureCoords_Assign = exports.vTextureCoords_Out = exports.vTextureCoords_In = exports.vColor_Assign = exports.vColor_Out = exports.vColor_In = void 0;
+exports.fragmentShaderCompleteObj = exports.fTbn_Calc = exports.fTangent_In = exports.fTBN_In = exports.fNormalCalc_Tangents = exports.fNormalCalc_noTangents = exports.fOutput_Lights_Color = exports.fOutput_Lights = exports.fDiffuseCoords = exports.fTextureCoords = exports.normalMapVar = exports.shadowMapVar = exports.bumbMapVar = exports.lightMapVar = exports.specularMapVar = exports.diffuseMapVar = exports.fColorIn = exports.materialVar = exports.SpotLightFuncImplObj = exports.PointLightFuncImplObj = exports.DirLightFuncImplObj = exports.LightSpecularWithTexture_Spec = exports.LightDiffuseWithTexture_Spec = exports.LightAmbientWithTexture_Spec = exports.LightSpecularWithTexture_Diff = exports.LightDiffuseWithTexture_Diff = exports.LightAmbientWithTexture_Diff = exports.LightSpecularWithTexture_Diff_Spec = exports.LightDiffuseWithTexture_Diff_Spec = exports.LightAmbientWithTexture_Diff_Spec = exports.SpotLightFuncDec = exports.PointLightFuncDec = exports.DirLightFuncDec = exports.SpotLightShader_NoPos = exports.SpotLightShader = exports.PointLightShader_NoPos = exports.PointLightShader = exports.DirectionalLightShader = exports.materialStruct = exports.vertexCompleteShaderObj = exports.vTbn_Assing = exports.vTbn_Out = exports.vTangentCalc = exports.vTangent_Assign = exports.vTangent_Out = exports.vTangent_In = exports.vTextureCoords_Assign = exports.vTextureCoords_Out = exports.vTextureCoords_In = exports.vColor_Assign = exports.vColor_Out = exports.vColor_In = exports.vMainBody_fPos_Calc_TBN = exports.vMainBody_fPos_Calc = void 0;
+var vMainBody_fPos_Calc = '\tfPos = vec3(model * vPosition);\n';
+exports.vMainBody_fPos_Calc = vMainBody_fPos_Calc;
+var vMainBody_fPos_Calc_TBN = '\tfPos = vec3(model * vPosition) * TBN;\n';
+exports.vMainBody_fPos_Calc_TBN = vMainBody_fPos_Calc_TBN;
 var vColor_In = 'in vec4 vColor;\n';
 exports.vColor_In = vColor_In;
 var vColor_Out = 'out vec4 fColor;\n';
@@ -3054,45 +3186,61 @@ var vTextureCoords_Out = 'out vec2 fTextureCoords;\n';
 exports.vTextureCoords_Out = vTextureCoords_Out;
 var vTextureCoords_Assign = '\tfTextureCoords = vTextureCoords;\n';
 exports.vTextureCoords_Assign = vTextureCoords_Assign;
+var vTangent_In = 'in vec3 vTangent;\n';
+exports.vTangent_In = vTangent_In;
+var vTangent_Out = 'out vec3 fTangent;\n';
+exports.vTangent_Out = vTangent_Out;
+var vTangent_Assign = '\tfTangent = normalize(normalMatrix * vTangent);\n';
+exports.vTangent_Assign = vTangent_Assign;
+var vTangentCalc = "\n    vec3 T = normalize(normalMatrix * vTangent);\n    vec3 N = normalize(fNormal);\n    T = normalize(T - dot(T, N) * N);\n    vec3 B = cross(N, T);\n    mat3 TBN = mat3(T, B, N);\n";
+exports.vTangentCalc = vTangentCalc;
+var vTbn_Out = 'out mat3 fTBN;\n';
+exports.vTbn_Out = vTbn_Out;
+var vTbn_Assing = '\tfTBN = TBN;\n';
+exports.vTbn_Assing = vTbn_Assing;
 
 var vertexCompleteShaderObj = function vertexCompleteShaderObj() {
   return {
-    version: "#version 300 es\n",
-    position: "in vec4 vPosition;\n",
+    version: '#version 300 es\n',
+    position: 'in vec4 vPosition;\n',
+    lightsPosUniform: '',
+    lightsPosOut: '',
     colorIn: '',
     textureCoordsIn: '',
-    diffuseCoordsIn: '',
     textureCoordsOut: '',
-    diffuseCoordsOut: '',
-    specularCoordsIn: '',
-    specularCoordsOut: '',
-    normalCoordsIn: '',
-    normalCoordsOut: '',
-    normalIn: "in vec3 vNormal;\n",
-    modelViewProj: "uniform mat4 model;\nuniform mat4 view;\nuniform mat4 projection;\n",
+    normalIn: 'in vec3 vNormal;\n',
+    tangentIn: '',
+    tangentOut: '',
+    modelViewProj: 'uniform mat4 model;\nuniform mat4 view;\nuniform mat4 projection;\n',
     colorOut: '',
-    normalOut: "out vec3 fNormal;\n",
-    fragPosOut: "out vec3 fPos;\n",
-    mainStart: "void main(){\n",
-    mainBody: "\tfNormal = mat3(transpose(inverse(model))) * vNormal;\n" + "\tfPos = vec3(model * vPosition);\n",
+    normalOut: 'out vec3 fNormal;\n',
+    tbnOut: '',
+    fragPosOut: 'out vec3 fPos;\n',
+    mainStart: 'void main(){\n',
+    mainBodyNormalCalc: '\tmat3 normalMatrix = mat3(transpose(inverse(model)));\n\tfNormal = normalMatrix * vNormal;\n',
     textureCoordsAssign: '',
-    diffuseAssign: '',
-    specularAssign: '',
-    normalAssign: '',
+    tangentAssign: '',
+    tbnCalc: '',
+    tbnAssign: '',
+    mainBodyFPos: '',
     colorAssign: '',
-    mainBodyOutput: '\tgl_Position = projection * view * model * vPosition;\n}'
+    mainBodyOutput: '\n\tgl_Position = projection * view * model * vPosition;\n}'
   };
 };
 
 exports.vertexCompleteShaderObj = vertexCompleteShaderObj;
-var materialStruct = "struct Material {\n" + "\tvec3 ambient;\n" + "\tvec3 diffuse;\n" + "\tvec3 specular;\n" + "\tfloat shininess;\n" + "};\n";
+var materialStruct = 'struct Material {\n' + '\tvec3 ambient;\n' + '\tvec3 diffuse;\n' + '\tvec3 specular;\n' + '\tfloat shininess;\n' + '};\n';
 exports.materialStruct = materialStruct;
 var DirectionalLightShader = "struct DirectionalLight {\n    vec3 direction;\n    vec3 ambient;\n    vec3 diffuse;\n    vec3 specular;\n};\n";
 exports.DirectionalLightShader = DirectionalLightShader;
 var PointLightShader = "struct PointLight {\n    vec3 position;\n    vec3 ambient;\n    vec3 diffuse;\n    vec3 specular;\n    float constant;\n    float linear;\n    float quadratic;\n};\n";
 exports.PointLightShader = PointLightShader;
+var PointLightShader_NoPos = "struct PointLight {\n    vec3 ambient;\n    vec3 diffuse;\n    vec3 specular;\n    float constant;\n    float linear;\n    float quadratic;\n};\n";
+exports.PointLightShader_NoPos = PointLightShader_NoPos;
 var SpotLightShader = "\nstruct SpotLight {\n    vec3 direction;\n    vec3 position;\n    vec3 ambient;\n    vec3 diffuse;\n    vec3 specular;\n    float constant;\n    float linear;\n    float quadratic;\n    float cutOff;\n    float outerCutOff;\n};\n";
 exports.SpotLightShader = SpotLightShader;
+var SpotLightShader_NoPos = "\nstruct SpotLight {\n    vec3 direction;\n    vec3 ambient;\n    vec3 diffuse;\n    vec3 specular;\n    float constant;\n    float linear;\n    float quadratic;\n    float cutOff;\n    float outerCutOff;\n};\n";
+exports.SpotLightShader_NoPos = SpotLightShader_NoPos;
 var DirLightFuncDec = 'vec3 CalcDirLight(DirectionalLight light, vec3 normal, vec3 viewDir);\n';
 exports.DirLightFuncDec = DirLightFuncDec;
 var PointLightFuncDec = 'vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);\n';
@@ -3182,6 +3330,16 @@ var fOutput_Lights = '\tfragColor = vec4(lightColor, 1.0);\n';
 exports.fOutput_Lights = fOutput_Lights;
 var fOutput_Lights_Color = '\tfragColor = vec4(lightColor, 1.0) * fColor;\n';
 exports.fOutput_Lights_Color = fOutput_Lights_Color;
+var fNormalCalc_noTangents = "\tvec3 norm = texture(normalTexture, fTextureCoords).rgb;\n\tnorm = normalize(norm * 2.0 - 1.0);\n";
+exports.fNormalCalc_noTangents = fNormalCalc_noTangents;
+var fNormalCalc_Tangents = "vec3 norm = texture(normalTexture, fTextureCoords).rgb;\nnorm = norm * 2.0 - 1.0;   \nnorm = normalize(fTBN * norm);";
+exports.fNormalCalc_Tangents = fNormalCalc_Tangents;
+var fTBN_In = 'in mat3 fTBN;\n';
+exports.fTBN_In = fTBN_In;
+var fTangent_In = 'in vec3 fTangent;\n';
+exports.fTangent_In = fTangent_In;
+var fTbn_Calc = "\tvec3 norm = normalize(fNormal) * ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\tvec3 tangent = normalize(fTangent) * ( float( gl_FrontFacing ) * 2.0 - 1.0 );\n\tvec3 bitangent = normalize(cross(norm, tangent));\n\tmat3 tbn = mat3(tangent, bitangent, norm);\n\tnorm = texture(normalTexture, fTextureCoords).rgb * 2. - 1.;\n\tnorm = normalize(tbn * norm);\n";
+exports.fTbn_Calc = fTbn_Calc;
 
 var fragmentShaderCompleteObj = function fragmentShaderCompleteObj() {
   return {
@@ -3192,6 +3350,8 @@ var fragmentShaderCompleteObj = function fragmentShaderCompleteObj() {
     lightsFuncDec: '',
     colorIn: '',
     normalIn: 'in vec3 fNormal;\n',
+    tangentIn: '',
+    tbnIn: '',
     fragPosIn: 'in vec3 fPos;\n',
     texturesCoords: '',
     samplers: '',
@@ -3200,6 +3360,7 @@ var fragmentShaderCompleteObj = function fragmentShaderCompleteObj() {
     lightsUniform: '',
     colorOut: 'out vec4 fragColor;\n',
     mainStart: 'void main(){\n',
+    normalCalc: '',
     lightsCalc: '',
     textureCalc: '',
     fragOutput: '\tfragColor = vec4(0.0, 0.0, 1.0, 1.0);\n',
@@ -3325,6 +3486,26 @@ var ShaderFactory = /*#__PURE__*/function () {
           vertexSource.textureCoordsIn = shaderDefault.vTextureCoords_In;
           vertexSource.textureCoordsOut = shaderDefault.vTextureCoords_Out;
           vertexSource.textureCoordsAssign = shaderDefault.vTextureCoords_Assign;
+
+          if (textures[_constants.TextureTypes.NormalMap]) {
+            vertexSource.tangentIn = shaderDefault.vTangent_In;
+            vertexSource.tangentOut = shaderDefault.vTangent_Out;
+            vertexSource.tangentAssign = shaderDefault.vTangent_Assign;
+            /* vertexSource.tbnOut = shaderDefault.vTbn_Out;
+            vertexSource.tbnCalc = shaderDefault.vTangentCalc;
+            vertexSource.tbnAssign = shaderDefault.vTbn_Assing; */
+
+            vertexSource.mainBodyFPos = shaderDefault.vMainBody_fPos_Calc; //TODO CHANGE
+
+            /* if(props.lights){
+                const tangentVertexLightsVars = this.getLightsPosForTangentSpace(props.lights.lights); 
+                vertexSource.lightsPosUniform = tangentVertexLightsVars.inUniforms;
+                vertexSource.lightsPosOut = tangentVertexLightsVars.outPos;
+                vertexSource.tangentCalc += tangentVertexLightsVars.tangentLightsCalc;
+            } */
+          } else {
+            vertexSource.mainBodyFPos = shaderDefault.vMainBody_fPos_Calc;
+          }
         }
       }
 
@@ -3346,9 +3527,6 @@ var ShaderFactory = /*#__PURE__*/function () {
     value: function CreateFragmentShaderFromProperties(props, n) {
       var fragmentSource = shaderDefault.fragmentShaderCompleteObj();
       var hasLights = false;
-      var hasTexture = {
-        hasDiffuseTexture: false
-      };
 
       if (props.material) {
         if (props.material.vertexColoring) {
@@ -3363,25 +3541,29 @@ var ShaderFactory = /*#__PURE__*/function () {
           fragmentSource.texturesCoords = shaderDefault.fTextureCoords;
 
           if (textures[_constants.TextureTypes.DiffuseMap]) {
-            fragmentSource.samplers += shaderDefault.diffuseMapVar; //fragmentSource.texturesCoords += shaderDefault.fDiffuseCoords;
-
-            hasTexture.hasDiffuseTexture = true;
+            fragmentSource.samplers += shaderDefault.diffuseMapVar;
           }
 
           if (textures[_constants.TextureTypes.SpecularMap]) {
-            fragmentSource.samplers += shaderDefault.specularMapVar; //fragmentSource.texturesCoords += shaderDefault.fSpecularCoords;
+            fragmentSource.samplers += shaderDefault.specularMapVar;
           }
 
           if (textures[_constants.TextureTypes.LightMap]) {
-            fragmentSource.samplers += shaderDefault.lightMapVar; //fragmentSource.texturesCoords += shaderDefault.fLightCoords;
+            fragmentSource.samplers += shaderDefault.lightMapVar;
           }
 
           if (textures[_constants.TextureTypes.BumpMap]) {
-            fragmentSource.samplers += shaderDefault.bumbMapVar; //fragmentSource.texturesCoords += shaderDefault.fBumpCoords;
+            fragmentSource.samplers += shaderDefault.bumbMapVar;
+          }
+
+          if (textures[_constants.TextureTypes.NormalMap]) {
+            fragmentSource.samplers += shaderDefault.normalMapVar; //fragmentSource.tbnIn = shaderDefault.fTBN_In;
+
+            fragmentSource.tangentIn = shaderDefault.fTangent_In;
           }
 
           if (textures[_constants.TextureTypes.ShadowMap]) {
-            fragmentSource.samplers += shaderDefault.shadowMapVar; //fragmentSource.texturesCoords += shaderDefault.fShadowCoords;
+            fragmentSource.samplers += shaderDefault.shadowMapVar;
           }
 
           fragmentSource.textureCalc = this.getTexturesCalc(props.material.textures);
@@ -3421,8 +3603,17 @@ var ShaderFactory = /*#__PURE__*/function () {
     }
   }, {
     key: "doLightCalcs",
-    value: function doLightCalcs(lights, textureTypes) {
-      var lightsCalc = '\tvec3 viewDir = normalize(viewPos - fPos);\n' + '\tvec3 norm = normalize(fNormal);\n'; // se c'è normal map usare quella
+    value: function doLightCalcs(lights, textures) {
+      var lightsCalc = '';
+
+      if (textures[_constants.TextureTypes.NormalMap]) {
+        lightsCalc = '\tvec3 viewDir = normalize(viewPos - fPos);\n'
+        /* +
+        shaderDefault.fNormalCalc_noTangents; */
+        + shaderDefault.fTbn_Calc;
+      } else {
+        lightsCalc = '\tvec3 viewDir = normalize(viewPos - fPos);\n' + '\tvec3 norm = normalize(fNormal);\n';
+      }
 
       for (var i = 0; i < lights.length; i++) {
         if (i == 0) {
@@ -3530,6 +3721,29 @@ var ShaderFactory = /*#__PURE__*/function () {
       }
 
       return r;
+    }
+  }, {
+    key: "getLightsPosForTangentSpace",
+    value: function getLightsPosForTangentSpace(lights) {
+      var inUniforms = '';
+      var outPos = '';
+
+      for (var i = 0; i < lights.length; i++) {
+        var lightType = lights[i].type;
+
+        if (lightType === _constants.LightTypes.PointLight || lightType === _constants.LightTypes.SpotLight) {
+          inUniforms += 'uniform vec3 vLightPos' + i + ';\n';
+          outPos += 'out vec3 fLightPos' + i + ';\n';
+        }
+
+        ;
+      }
+
+      return {
+        inUniforms: inUniforms,
+        outPos: outPos,
+        tangentLightsCalc: tangentLightsCalc
+      };
     } //FOR FUTURE
 
   }, {
@@ -3550,6 +3764,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.Mesh = void 0;
+
+var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
 
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
@@ -3596,7 +3812,7 @@ var Mesh = /*#__PURE__*/function () {
    * @param {*} textures // props.material.textures = {  DIFFUSE_MAP: 1, SPECULAR_MAP: 1, NORMAL_MAP: 1, LIGHT_MAP: 1, BUMP_MAP: 1, SHADOW_MAP: 1 };
    * @param {*} textCoords 
    */
-  function Mesh(gl, vertices, indices, shaders, opt, textures, textCoords, normals, colors) {
+  function Mesh(gl, vertices, indices, shaders, opt, textures, textCoords, normals, tangents, colors) {
     (0, _classCallCheck2.default)(this, Mesh);
     (0, _defineProperty2.default)(this, "vertices", void 0);
     (0, _defineProperty2.default)(this, "indices", void 0);
@@ -3611,6 +3827,7 @@ var Mesh = /*#__PURE__*/function () {
     (0, _defineProperty2.default)(this, "VBO", void 0);
     (0, _defineProperty2.default)(this, "EBO", void 0);
     (0, _defineProperty2.default)(this, "NBO", void 0);
+    (0, _defineProperty2.default)(this, "TBO", void 0);
     (0, _defineProperty2.default)(this, "type", void 0);
     (0, _defineProperty2.default)(this, "locations", {});
     (0, _defineProperty2.default)(this, "textures", {});
@@ -3639,6 +3856,7 @@ var Mesh = /*#__PURE__*/function () {
     ;
     this.textCoords = textCoords;
     this.normals = normals;
+    this.tangents = tangents;
     this.shaders = {}; //Create shader if passed else do it automatically from info
     // TODO create shader from object properties, update when properties change (eg. a component in the object is removed)
 
@@ -3664,6 +3882,16 @@ var Mesh = /*#__PURE__*/function () {
         var normalLoc = gl.getAttribLocation(this.shaders.program.program, 'vNormal');
         gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(normalLoc);
+      }
+
+      if (this.tangents) {
+        this.TBO = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.TBO);
+        gl.bufferData(gl.ARRAY_BUFFER, (0, _Vector_Matrix.flatten)(this.tangents), gl.STATIC_DRAW);
+        var tangentLoc = gl.getAttribLocation(this.shaders.program.program, 'vTangent');
+        console.log('tangentLoc', tangentLoc, this.shaders.fragment.source);
+        gl.vertexAttribPointer(tangentLoc, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(tangentLoc);
       }
 
       this.locations.textures = {};
@@ -3793,6 +4021,8 @@ var Mesh = /*#__PURE__*/function () {
   }, {
     key: "getLocations",
     value: function getLocations(lights) {
+      var _this = this;
+
       var gl = this.gl; //vertex
 
       this.locations.modelLoc = gl.getUniformLocation(this.shaders.program.program, 'model');
@@ -3819,6 +4049,25 @@ var Mesh = /*#__PURE__*/function () {
           }
         }
       }
+
+      this.locations.texturesLocs = {};
+      Object.entries(this.textures).forEach(function (_ref) {
+        var _ref2 = (0, _slicedToArray2.default)(_ref, 2),
+            k = _ref2[0],
+            texture = _ref2[1];
+
+        if (texture) {
+          if (k === _constants.TextureTypes.DiffuseMap) {
+            _this.locations.texturesLocs[_constants.TextureTypes.DiffuseMap] = gl.getUniformLocation(_this.shaders.program.program, 'diffuseTexture');
+          } else if (k === _constants.TextureTypes.SpecularMap) {
+            _this.locations.texturesLocs[_constants.TextureTypes.SpecularMap] = gl.getUniformLocation(_this.shaders.program.program, 'specularTexture');
+          } else if (k === _constants.TextureTypes.NormalMap) {
+            _this.locations.texturesLocs[_constants.TextureTypes.NormalMap] = gl.getUniformLocation(_this.shaders.program.program, 'normalTexture');
+          } else if (k === _constants.TextureTypes.ShadowMap) {
+            _this.locations.texturesLocs[_constants.TextureTypes.ShadowMap] = gl.getUniformLocation(_this.shaders.program.program, 'shadowTexture');
+          }
+        }
+      });
     }
   }, {
     key: "updateShadersAndProgram",
@@ -3843,7 +4092,6 @@ var Mesh = /*#__PURE__*/function () {
       this.shaders.vertex = new _Shader.Shader(this.gl, 'vertex', v);
       ;
       this.shaders.fragment = new _Shader.Shader(this.gl, 'fragment', f);
-      console.log(this.id, name, this.textures, props);
       var shaders = [];
 
       for (var key in this.shaders) {
@@ -3865,6 +4113,8 @@ var Mesh = /*#__PURE__*/function () {
   }, {
     key: "render",
     value: function render(gl, camera) {
+      var _this2 = this;
+
       var transform = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
       var type = arguments.length > 3 ? arguments[3] : undefined;
       var material = arguments.length > 4 ? arguments[4] : undefined;
@@ -3918,8 +4168,14 @@ var Mesh = /*#__PURE__*/function () {
         }
       }
 
+      Object.entries(this.locations.texturesLocs).forEach(function (_ref3) {
+        var _ref4 = (0, _slicedToArray2.default)(_ref3, 2),
+            k = _ref4[0],
+            loc = _ref4[1];
+
+        gl.uniform1i(loc, _this2.textures[k].textureUnit);
+      });
       Object.values(this.textures).forEach(function (texture) {
-        //load texture path
         if (texture) texture.ActiveTexture(gl);
       });
 
@@ -3965,13 +4221,47 @@ var Mesh = /*#__PURE__*/function () {
   }, {
     key: "setupPointLight",
     value: function setupPointLight(gl, lightLocs, light) {
-      gl.uniform3fv(lightLocs.position, light.light.position);
+      /* gl.uniform3fv(lightLocs.position, light.light.position);
       gl.uniform3fv(lightLocs.ambient, light.light.ambient);
       gl.uniform3fv(lightLocs.diffuse, light.light.diffuse);
       gl.uniform3fv(lightLocs.specular, light.light.specular);
       gl.uniform1f(lightLocs.constant, light.light.constant);
       gl.uniform1f(lightLocs.linear, light.light.linear);
-      gl.uniform1f(lightLocs.quadratic, light.light.quadratic);
+      gl.uniform1f(lightLocs.quadratic, light.light.quadratic); */
+      Object.keys(lightLocs).forEach(function (k) {
+        switch (k) {
+          case 'position':
+            gl.uniform3fv(lightLocs.position, light.light.position);
+            break;
+
+          case 'ambient':
+            gl.uniform3fv(lightLocs.ambient, light.light.ambient);
+            break;
+
+          case 'diffuse':
+            gl.uniform3fv(lightLocs.diffuse, light.light.diffuse);
+            break;
+
+          case 'specular':
+            gl.uniform3fv(lightLocs.specular, light.light.specular);
+            break;
+
+          case 'constant':
+            gl.uniform1f(lightLocs.constant, light.light.constant);
+            break;
+
+          case 'linear':
+            gl.uniform1f(lightLocs.linear, light.light.linear);
+            break;
+
+          case 'quadratic':
+            gl.uniform1f(lightLocs.quadratic, light.light.quadratic);
+            break;
+
+          default:
+            break;
+        }
+      });
     }
   }, {
     key: "setupSpotLight",
@@ -3993,7 +4283,7 @@ var Mesh = /*#__PURE__*/function () {
 
 exports.Mesh = Mesh;
 (0, _defineProperty2.default)(Mesh, "nextId", 1);
-},{"@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js","@babel/runtime/helpers/defineProperty":"node_modules/@babel/runtime/helpers/defineProperty.js","./Shader":"src/common/Shader.js","./ShaderProgram":"src/common/ShaderProgram.js","../shaders/ShaderFactory":"src/shaders/ShaderFactory.js","./Utils/Vector_Matrix":"src/common/Utils/Vector_Matrix.js","./Material":"src/common/Material.js","./Utils/constants":"src/common/Utils/constants.js"}],"src/common/Texture.js":[function(require,module,exports) {
+},{"@babel/runtime/helpers/slicedToArray":"node_modules/@babel/runtime/helpers/slicedToArray.js","@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js","@babel/runtime/helpers/defineProperty":"node_modules/@babel/runtime/helpers/defineProperty.js","./Shader":"src/common/Shader.js","./ShaderProgram":"src/common/ShaderProgram.js","../shaders/ShaderFactory":"src/shaders/ShaderFactory.js","./Utils/Vector_Matrix":"src/common/Utils/Vector_Matrix.js","./Material":"src/common/Material.js","./Utils/constants":"src/common/Utils/constants.js"}],"src/common/Texture.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4181,9 +4471,9 @@ var Light = /*#__PURE__*/function (_Component) {
 
     _this = _super.call.apply(_super, [this].concat(args));
     (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "id", void 0);
-    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "diffuse", (0, _Vector_Matrix.vec3)(0.5, 0.5, 0.5));
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "diffuse", (0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0));
     (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "ambient", (0, _Vector_Matrix.vec3)(0.1, 0.1, 0.1));
-    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "specular", (0, _Vector_Matrix.vec3)(0.8, 0.8, 0.8));
+    (0, _defineProperty2.default)((0, _assertThisInitialized2.default)(_this), "specular", (0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0));
     return _this;
   }
 
@@ -5151,87 +5441,7 @@ try {
 },{}],"node_modules/@babel/runtime/regenerator/index.js":[function(require,module,exports) {
 module.exports = require("regenerator-runtime");
 
-},{"regenerator-runtime":"node_modules/regenerator-runtime/runtime.js"}],"node_modules/@babel/runtime/helpers/arrayWithHoles.js":[function(require,module,exports) {
-function _arrayWithHoles(arr) {
-  if (Array.isArray(arr)) return arr;
-}
-
-module.exports = _arrayWithHoles;
-},{}],"node_modules/@babel/runtime/helpers/iterableToArrayLimit.js":[function(require,module,exports) {
-function _iterableToArrayLimit(arr, i) {
-  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
-  var _arr = [];
-  var _n = true;
-  var _d = false;
-  var _e = undefined;
-
-  try {
-    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-      _arr.push(_s.value);
-
-      if (i && _arr.length === i) break;
-    }
-  } catch (err) {
-    _d = true;
-    _e = err;
-  } finally {
-    try {
-      if (!_n && _i["return"] != null) _i["return"]();
-    } finally {
-      if (_d) throw _e;
-    }
-  }
-
-  return _arr;
-}
-
-module.exports = _iterableToArrayLimit;
-},{}],"node_modules/@babel/runtime/helpers/arrayLikeToArray.js":[function(require,module,exports) {
-function _arrayLikeToArray(arr, len) {
-  if (len == null || len > arr.length) len = arr.length;
-
-  for (var i = 0, arr2 = new Array(len); i < len; i++) {
-    arr2[i] = arr[i];
-  }
-
-  return arr2;
-}
-
-module.exports = _arrayLikeToArray;
-},{}],"node_modules/@babel/runtime/helpers/unsupportedIterableToArray.js":[function(require,module,exports) {
-var arrayLikeToArray = require("./arrayLikeToArray");
-
-function _unsupportedIterableToArray(o, minLen) {
-  if (!o) return;
-  if (typeof o === "string") return arrayLikeToArray(o, minLen);
-  var n = Object.prototype.toString.call(o).slice(8, -1);
-  if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return arrayLikeToArray(o, minLen);
-}
-
-module.exports = _unsupportedIterableToArray;
-},{"./arrayLikeToArray":"node_modules/@babel/runtime/helpers/arrayLikeToArray.js"}],"node_modules/@babel/runtime/helpers/nonIterableRest.js":[function(require,module,exports) {
-function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-
-module.exports = _nonIterableRest;
-},{}],"node_modules/@babel/runtime/helpers/slicedToArray.js":[function(require,module,exports) {
-var arrayWithHoles = require("./arrayWithHoles");
-
-var iterableToArrayLimit = require("./iterableToArrayLimit");
-
-var unsupportedIterableToArray = require("./unsupportedIterableToArray");
-
-var nonIterableRest = require("./nonIterableRest");
-
-function _slicedToArray(arr, i) {
-  return arrayWithHoles(arr) || iterableToArrayLimit(arr, i) || unsupportedIterableToArray(arr, i) || nonIterableRest();
-}
-
-module.exports = _slicedToArray;
-},{"./arrayWithHoles":"node_modules/@babel/runtime/helpers/arrayWithHoles.js","./iterableToArrayLimit":"node_modules/@babel/runtime/helpers/iterableToArrayLimit.js","./unsupportedIterableToArray":"node_modules/@babel/runtime/helpers/unsupportedIterableToArray.js","./nonIterableRest":"node_modules/@babel/runtime/helpers/nonIterableRest.js"}],"node_modules/@babel/runtime/helpers/asyncToGenerator.js":[function(require,module,exports) {
+},{"regenerator-runtime":"node_modules/regenerator-runtime/runtime.js"}],"node_modules/@babel/runtime/helpers/asyncToGenerator.js":[function(require,module,exports) {
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
     var info = gen[key](arg);
@@ -5450,41 +5660,7 @@ var Request = /*#__PURE__*/function () {
 }();
 
 exports.Request = Request;
-},{"@babel/runtime/regenerator":"node_modules/@babel/runtime/regenerator/index.js","@babel/runtime/helpers/slicedToArray":"node_modules/@babel/runtime/helpers/slicedToArray.js","@babel/runtime/helpers/asyncToGenerator":"node_modules/@babel/runtime/helpers/asyncToGenerator.js","@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js"}],"node_modules/@babel/runtime/helpers/arrayWithoutHoles.js":[function(require,module,exports) {
-var arrayLikeToArray = require("./arrayLikeToArray");
-
-function _arrayWithoutHoles(arr) {
-  if (Array.isArray(arr)) return arrayLikeToArray(arr);
-}
-
-module.exports = _arrayWithoutHoles;
-},{"./arrayLikeToArray":"node_modules/@babel/runtime/helpers/arrayLikeToArray.js"}],"node_modules/@babel/runtime/helpers/iterableToArray.js":[function(require,module,exports) {
-function _iterableToArray(iter) {
-  if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
-}
-
-module.exports = _iterableToArray;
-},{}],"node_modules/@babel/runtime/helpers/nonIterableSpread.js":[function(require,module,exports) {
-function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-
-module.exports = _nonIterableSpread;
-},{}],"node_modules/@babel/runtime/helpers/toConsumableArray.js":[function(require,module,exports) {
-var arrayWithoutHoles = require("./arrayWithoutHoles");
-
-var iterableToArray = require("./iterableToArray");
-
-var unsupportedIterableToArray = require("./unsupportedIterableToArray");
-
-var nonIterableSpread = require("./nonIterableSpread");
-
-function _toConsumableArray(arr) {
-  return arrayWithoutHoles(arr) || iterableToArray(arr) || unsupportedIterableToArray(arr) || nonIterableSpread();
-}
-
-module.exports = _toConsumableArray;
-},{"./arrayWithoutHoles":"node_modules/@babel/runtime/helpers/arrayWithoutHoles.js","./iterableToArray":"node_modules/@babel/runtime/helpers/iterableToArray.js","./unsupportedIterableToArray":"node_modules/@babel/runtime/helpers/unsupportedIterableToArray.js","./nonIterableSpread":"node_modules/@babel/runtime/helpers/nonIterableSpread.js"}],"src/common/Loaders/ModelLoader.js":[function(require,module,exports) {
+},{"@babel/runtime/regenerator":"node_modules/@babel/runtime/regenerator/index.js","@babel/runtime/helpers/slicedToArray":"node_modules/@babel/runtime/helpers/slicedToArray.js","@babel/runtime/helpers/asyncToGenerator":"node_modules/@babel/runtime/helpers/asyncToGenerator.js","@babel/runtime/helpers/classCallCheck":"node_modules/@babel/runtime/helpers/classCallCheck.js","@babel/runtime/helpers/createClass":"node_modules/@babel/runtime/helpers/createClass.js"}],"src/common/Loaders/ModelLoader.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5904,7 +6080,7 @@ inputs.lockMouse(canvas);
 var gl = _webglUtils.WebGLUtils.setupWebGL(canvas);
 
 var aspect = gl.drawingBufferWidth / gl.drawingBufferHeight;
-var camera = new _Camera.Camera((0, _Vector_Matrix.vec3)(0, 0, 0), up, 5, "perspective", {}, {
+var camera = new _Camera.Camera((0, _Vector_Matrix.vec3)(0, 0, 5), up, 5, "perspective", {}, {
   fov: 45,
   aspect: aspect,
   near: 0.1,
@@ -5924,9 +6100,9 @@ var camera = new _Camera.Camera((0, _Vector_Matrix.vec3)(0, 0, 0), up, 5, "persp
 gl.enable(gl.DEPTH_TEST); //gl.enable(gl.CULL_FACE);
 
 gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-gl.clearColor(0.0, 0.0, 0.0, 1.0);
 var engine = new _Engine.Engine(gl, {
-  showFps: true
+  showFps: true,
+  clearColor: [0.0, 0.0, 0.0, 0.0]
 });
 var scene = new _Scene.Scene();
 var req = new _Request.Request('https://albertocontorno.github.io/WebGL_Engine/assets/windmill.obj');
@@ -5937,11 +6113,17 @@ Promise.all([req.send(), reqMtl.send()]).then(function (res) {
   var loader = new _ObjLoader.ObjLoader();
   var m = loader.parse(obj);
   console.log(m);
-  var o = new _Object.SceneObject(null, 'test load');
+  var o = new _Object.SceneObject(null, 'holder');
+  scene.addObject(o);
   var mtl = loader.parseMTL(mat);
   console.log(mtl);
+
+  o.onUpdate = function () {
+    o.transform.rotation[1] += 25 * engine.time.deltaTime; //o.transform.rotation[0] += 5 * engine.time.deltaTime; 
+  };
+
   m.geometries.forEach(function (g) {
-    var oo = new _Object.SceneObject(null, 'test load');
+    var oo = new _Object.SceneObject(null, 'sub');
     var verts = [];
     var verts_n = [];
     var text_coords = [];
@@ -5966,15 +6148,21 @@ Promise.all([req.send(), reqMtl.send()]).then(function (res) {
       }
     }
 
-    if (data.texcoord && data.normal) {
-      tangents = (0, _NormalsGenerator.generateTangents)(verts, text_coords);
+    var ooMat = mtl[g.material];
+
+    if (data.texcoord && data.normal && ooMat['normalMap']) {
+      var tangents_ = (0, _NormalsGenerator.generateTangents)(verts, text_coords);
+      tangents = [];
+
+      for (var _i3 = 0; _i3 < tangents_.length - 2; _i3 += 3) {
+        tangents.push((0, _Vector_Matrix.vec3)(tangents_[_i3], tangents_[_i3 + 1], tangents_[_i3 + 2]));
+      }
     }
 
-    var ooMesh = new _Mesh.Mesh(gl, verts, null, null, null, null, text_coords, verts_n, colors);
+    var ooMesh = new _Mesh.Mesh(gl, verts, null, null, null, null, text_coords, verts_n, tangents);
     oo.addMesh(ooMesh);
     oo.parent = o;
     scene.addObject(oo);
-    var ooMat = mtl[g.material];
 
     if (ooMat['diffuseMap']) {
       var diffuseMap = new _Texture.Texture(0, null, 'assets/' + ooMat['diffuseMap'], gl.RGB, gl.RGB, {
@@ -5982,6 +6170,15 @@ Promise.all([req.send(), reqMtl.send()]).then(function (res) {
       });
       diffuseMap.LoadTexture(gl);
       ooMesh.textures.DIFFUSE_MAP = diffuseMap;
+    }
+
+    if (ooMat['normalMap']) {
+      console.log('NORMAL MAP ' + ooMat['normalMap']);
+      var normalMap = new _Texture.Texture(2, null, 'assets/' + ooMat['normalMap'], gl.RGB, gl.RGB, {
+        flipY: true
+      });
+      normalMap.LoadTexture(gl);
+      ooMesh.textures.NORMAL_MAP = normalMap;
     }
 
     if (ooMat['specularMap']) {
@@ -5994,42 +6191,11 @@ Promise.all([req.send(), reqMtl.send()]).then(function (res) {
 
     oo.material = new _Material.Material(ooMat.ambient, ooMat.diffuse, ooMat.specular, ooMat.shininess);
   });
-  o.transform.position = [-2, 3, 0]; //o.transform.scale = [.5,.5,.5]
-
-  scene.addObject(o); //initMeshBuffers(gl, m);
+  o.transform.position = [0, 0, -3];
+  o.transform.rotation = [0, -90, 0];
+  o.transform.scale = [.1, .1, .1];
+  scene.addObject(o);
 });
-var vertices = [(0, _Vector_Matrix.vec4)(-0.5, -0.5, 0.5, 1.0), //l b 0 0
-(0, _Vector_Matrix.vec4)(-0.5, 0.5, 0.5, 1.0), //l t  0 1
-(0, _Vector_Matrix.vec4)(0.5, -0.5, 0.5, 1.0), //r b 1 0
-(0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), //r t 1 1
-(0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), //4 l b 
-(0, _Vector_Matrix.vec4)(-0.5, 0.5, -0.5, 1.0), //5 l t
-(0, _Vector_Matrix.vec4)(0.5, -0.5, -0.5, 1.0), //6 r b
-(0, _Vector_Matrix.vec4)(0.5, 0.5, -0.5, 1.0) //7 r t
-];
-var vertices1 = [(0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, -0.5, 1.0)];
-var normals = [(0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0)];
-var normals1 = [(0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0)];
-var floorTextCoords = [(0, _Vector_Matrix.vec2)(0, 0), (0, _Vector_Matrix.vec2)(1, 0), (0, _Vector_Matrix.vec2)(1, 1), //
-(0, _Vector_Matrix.vec2)(1, 1), (0, _Vector_Matrix.vec2)(0, 1), (0, _Vector_Matrix.vec2)(0, 0), //
-(0, _Vector_Matrix.vec2)(0, 0), (0, _Vector_Matrix.vec2)(1, 0), (0, _Vector_Matrix.vec2)(1, 1), //
-(0, _Vector_Matrix.vec2)(1, 1), (0, _Vector_Matrix.vec2)(0, 1), (0, _Vector_Matrix.vec2)(0, 0), //
-(0, _Vector_Matrix.vec2)(0, 0), (0, _Vector_Matrix.vec2)(1, 0), (0, _Vector_Matrix.vec2)(1, 1), //
-(0, _Vector_Matrix.vec2)(1, 1), (0, _Vector_Matrix.vec2)(0, 1), (0, _Vector_Matrix.vec2)(0, 0), //
-(0, _Vector_Matrix.vec2)(0, 0), (0, _Vector_Matrix.vec2)(1, 0), (0, _Vector_Matrix.vec2)(1, 1), //
-(0, _Vector_Matrix.vec2)(1, 1), (0, _Vector_Matrix.vec2)(0, 1), (0, _Vector_Matrix.vec2)(0, 0), //
-(0, _Vector_Matrix.vec2)(0, 0), (0, _Vector_Matrix.vec2)(1, 0), (0, _Vector_Matrix.vec2)(1, 1), //
-(0, _Vector_Matrix.vec2)(1, 1), (0, _Vector_Matrix.vec2)(0, 1), (0, _Vector_Matrix.vec2)(0, 0), //
-(0, _Vector_Matrix.vec2)(0, 0), (0, _Vector_Matrix.vec2)(1, 0), (0, _Vector_Matrix.vec2)(1, 1), //
-(0, _Vector_Matrix.vec2)(1, 1), (0, _Vector_Matrix.vec2)(0, 1), (0, _Vector_Matrix.vec2)(0, 0) //
-];
-var indices = [//front
-0, 2, 1, 2, 3, 1, //back
-4, 5, 6, 6, 5, 7, //left
-0, 1, 4, 4, 1, 5, //right
-2, 6, 3, 6, 7, 3, //top
-3, 7, 1, 7, 5, 1, //bottom
-2, 0, 6, 6, 0, 4];
 
 function handleInputs() {
   if (inputs.isKeyDown(inputs.keyCodes.KEYNAMES.shift) && inputs.isKeyDown(inputs.keyCodes.KEYNAMES.w)) {
@@ -6077,85 +6243,37 @@ function handleInputs() {
   camera.updateCameraDirection(inputs.getMouseMovX(), inputs.getMouseMovY(), engine.time.deltaTime);
 }
 
-var obj = new _Object.SceneObject(null, 'obj');
-var obj2 = new _Object.SceneObject(null, 'obj2');
-var obj3 = new _Object.SceneObject(null, 'obj3');
-var lightsObj = new _Object.SceneObject(null, 'lights');
-var robotBody = new _Object.SceneObject(null, 'robotBody');
-var robotUpperArm = new _Object.SceneObject(null, 'robotUpperArm');
-var robotLowerArm = new _Object.SceneObject(null, 'robotLowerArm');
-var mat = new _Material.Material((0, _Vector_Matrix.vec3)(0.0, 0.0, 0.1), (0, _Vector_Matrix.vec3)(0.1, 0.0, 0.7));
-mat.shininess = 256;
-obj.material = mat;
-obj2.material = mat;
-obj3.material = mat;
-robotBody.material = new _Material.Material((0, _Vector_Matrix.vec3)(0.2, 0.0, 0.0), (0, _Vector_Matrix.vec3)(0.9, 0.1, 0.2));
-robotUpperArm.material = mat;
-robotLowerArm.material = mat;
-var floor = new _Object.SceneObject(null, 'floor');
-floor.material = new _Material.Material((0, _Vector_Matrix.vec3)(0.2, 0.0, 0.0), (0, _Vector_Matrix.vec3)(0.9, 0.1, 0.2));
-floor.transform.position = [0, -0.75, 0];
-floor.transform.scale = [5, 0.5, 5];
-var floorMesh = new _Mesh.Mesh(gl, vertices1, null, null, null, null, floorTextCoords, normals);
-var textureFloor = new _Texture.Texture(0, null, 'assets/download.jpg', gl.RGB, gl.RGB);
-textureFloor.LoadTexture(gl);
-floorMesh.textures.DIFFUSE_MAP = textureFloor;
-floor.addMesh(floorMesh);
-scene.addObject(floor);
-scene.addObject(obj);
-scene.addObject(obj2);
-scene.addObject(obj3);
-scene.addObject(robotBody);
-scene.addObject(robotUpperArm);
-scene.addObject(robotLowerArm);
-scene.addObject(lightsObj);
+var vertices1 = [(0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, -0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, -0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, 0.5, 1.0), (0, _Vector_Matrix.vec4)(-0.5, 0.5, -0.5, 1.0)];
+var normals = [(0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, -1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(0.0, 0.0, 1.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(-1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(1.0, 0.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, -1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0)];
 var cube = new _Mesh.Mesh(gl, vertices1, null, null, null, null, null, normals);
-var cube2 = new _Mesh.Mesh(gl, vertices1, null, null, null, null, null, normals);
-var cube3 = new _Mesh.Mesh(gl, vertices1, null, null, null, null, null, normals);
-obj.addMesh(cube);
-obj.transform.rotation = [0, 0, 0];
-obj2.addMesh(cube2);
-obj2.transform.position = [2, 0, 0];
-obj2.transform.rotation = [0, 50, 0];
-obj3.addMesh(cube3);
-obj2.addChild(obj3);
-obj3.transform.position = [-1, 0, -3];
-obj3.transform.scale = [1, 1, 2]; //obj.addMesh(cube3);
-
-robotBody.addMesh(cube3);
-robotBody.addChild(robotLowerArm);
-robotBody.transform.position = [1, 2, 0];
-robotBody.transform.rotation = [0, 30, 0];
-robotLowerArm.addMesh(cube3);
-robotLowerArm.addChild(robotUpperArm);
-robotLowerArm.transform.position = [0, 1, 0];
-robotLowerArm.transform.scale = [0.5, 1, 0.5];
-robotLowerArm.transform.rotation = [0, 30, 0];
-robotUpperArm.addMesh(cube3);
-robotUpperArm.transform.position = [0, 1, 0];
-robotUpperArm.transform.scale = [0.3, 1, 0.3];
+var lightsObj = new _Object.SceneObject(null, 'lights');
+scene.addObject(lightsObj);
 var dirLight = new _DirectionalLight.DirectionalLight();
 dirLight.ambient = (0, _Vector_Matrix.vec3)(0.1, 0.1, 0.1);
 dirLight.diffuse = (0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0);
-dirLight.direction = (0, _Vector_Matrix.vec3)(0.3, -1.0, 0.1);
+dirLight.direction = (0, _Vector_Matrix.vec3)(-1, -1, 5);
+dirLight.specular = (0, _Vector_Matrix.vec3)(1, 1, 1);
 var pointLight_obj = new _Object.SceneObject(null, 'dirLight');
-pointLight_obj.material = new _Material.Material((0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0), (0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0));
-scene.addObject(pointLight_obj);
 pointLight_obj.addMesh(cube);
-pointLight_obj.transform.position = [0.0, 6, -7.0];
-pointLight_obj.transform.scale = [.2, .2, .2];
+pointLight_obj.material = new _Material.Material((0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0), (0, _Vector_Matrix.vec3)(0.0, 1.0, 0.0));
+scene.addObject(pointLight_obj);
+pointLight_obj.transform.position = [0.0, 0, -2.0];
+pointLight_obj.transform.scale = [.1, .1, .1];
 var pointLight = new _PointLight.PointLight();
-pointLight.position = (0, _Vector_Matrix.vec3)(0.0, 4, -7.0);
+pointLight.position = (0, _Vector_Matrix.vec3)(0.0, 0, -2.0);
 pointLight.diffuse = (0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0);
-var pointLight_obj2 = new _Object.SceneObject(null, 'dirLight');
-pointLight_obj2.material = new _Material.Material((0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0), (0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0));
-scene.addObject(pointLight_obj2);
+/* var pointLight_obj2 = new SceneObject(null, 'dirLight');
 pointLight_obj2.addMesh(cube);
+pointLight_obj2.material = new Material(vec3(1.0, 1.0, 1.0), vec3(1.0, 1.0, 1.0));
+scene.addObject(pointLight_obj2);
+
 pointLight_obj2.transform.position = [0.0, -3.0, 0.0];
 pointLight_obj2.transform.scale = [.2, .2, .2];
-var pointLight2 = new _PointLight.PointLight();
-pointLight2.position = (0, _Vector_Matrix.vec3)(0.0, -3.0, 0.0);
-pointLight2.diffuse = (0, _Vector_Matrix.vec3)(1.0, 1.0, 1.0);
+
+let pointLight2 = new PointLight();
+pointLight2.position = vec3(0.0, -3.0, 0.0);
+pointLight2.diffuse = vec3(1.0, 1.0, 1.0); */
+
 var spotLight = new _SpotLight.SpotLight();
 spotLight.direction = (0, _Vector_Matrix.vec3)(0, 1.0, 0.0);
 spotLight.position = (0, _Vector_Matrix.vec3)(0.0, 2.0, -3.0);
@@ -6163,15 +6281,16 @@ spotLight.cutOff = 0.011;
 spotLight.outerCutOff = 0.512;
 spotLight.ambient = (0, _Vector_Matrix.vec3)(1.0, 0.1, 0.1);
 lightsObj.addComponent(dirLight);
-lightsObj.addComponent(pointLight);
-lightsObj.addComponent(pointLight2); //obj3.addComponent(spotLight);
+/* lightsObj.addComponent(pointLight); */
+
+/* lightsObj.addComponent(pointLight2); */
 
 var gameManager = new _Object.SceneObject(null, 'gm');
 console.log(engine);
 
 gameManager.onUpdate = function () {
   handleInputs();
-  inputs.clearMousePosition(); //obj.transform.rotation[1] += 0.1;
+  inputs.clearMousePosition();
 };
 
 scene.addObject(gameManager);
@@ -6211,7 +6330,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55005" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54852" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
